@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0f1020">
 <title>Savings Challenge · 100 envelope, 52 week & no-spend tracker</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23F28C6B'/%3E%3Ccircle cx='32' cy='32' r='13' fill='%23fff'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#0e0f1d; --bg2:#14162a; --surface:#191c33; --surface2:#222640; --line:#2c3150;
@@ -247,7 +248,7 @@ const ED = Object.assign({ key: 'calm-money-v1', name: 'Calm Money', sub: 'Budge
 if (ED.css) { const st = document.createElement('style'); st.textContent = ED.css; document.head.appendChild(st); }
 const KEY = DEMO ? ED.key + '-demo' : ED.key;
 const demoBlocked = () => DEMO && state.spends.filter(x => x.ts).length >= DEMO_LIMIT;
-function demoWall() { modal(`<div class="wz"><div class="wz-emoji">💛</div><h2>That's the free demo's ${DEMO_LIMIT} spends</h2><p class="muted" style="line-height:1.6">Hope it already feels calmer. Everything you typed stays readable here. The full planner has no limits, works offline from your Home Screen, and opens your backup file so nothing is lost.</p><div class="row" style="margin-top:18px"><button class="btn ghost" data-act="backup">Download my backup</button><span style="flex:1"></span><a class="btn" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></div></div>`); }
+function demoWall() { modal(`<div class="wz"><div class="wz-emoji">💛</div><h2>That's the free demo's ${DEMO_LIMIT} spends</h2><p class="muted" style="line-height:1.6">Hope it already feels calmer. Everything you typed stays readable here. The full planner has no limits, comes with an offline copy, and opens your backup file so nothing is lost.</p><div class="row" style="margin-top:18px"><button class="btn ghost" data-act="backup">Download my backup</button><span style="flex:1"></span><a class="btn" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></div></div>`); }
 const $ = (s, el = document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -673,7 +674,7 @@ function vToday() {
   const left = Math.max(0, sf.total), share = left + spentPeriod > 0 ? left / (left + spentPeriod) : 0;
   const soonest = first && daysBetween(d0(), first.d);
   const html = `
-  ${DEMO ? `<div class="banner"><span>✨ <b>Free demo</b>: every screen, no watermark. Log up to ${DEMO_LIMIT} spends (${Math.max(0, DEMO_LIMIT - state.spends.filter(x => x.ts).length)} left).</span><span class="row"><a class="btn sm" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></span></div>` : ''}
+  ${demoBanner()}
   ${state.demo ? `<div class="banner"><span>👋 These are <b>example numbers</b> so you can look around safely. Nothing here is real.</span><span class="row"><button class="btn sm" data-act="startFresh">Start my own</button></span></div>` : ''}
   ${(() => { const pk = monthKey(new Date(d0().getFullYear(), d0().getMonth() - 1, 1)); return !DEMO && d0().getDate() <= 7 && state.wrappedSeen !== pk && state.spends.some(x => x.date.startsWith(pk)) ? `<div class="banner"><span>🎉 Your <b>${esc(fmtD(new Date(d0().getFullYear(), d0().getMonth() - 1, 1), { month: 'long' }))} Wrapped</b> is ready: what you kept, your no-spend days and more.</span><button class="btn sm" data-act="wrapLast">See it</button></div>` : ''; })()}<div><h1 class="hello">${greet}${s.name ? ', ' + esc(s.name) : ''}.</h1><div class="sub">${fmtD(d0(), { weekday: 'long', day: 'numeric', month: 'long' })} · payday ${fmtD(p)} · ${sf.days} day${sf.days === 1 ? '' : 's'} to go</div></div>
   <div class="chips hide-in-focus"><button class="chip" data-act="simple">${s.simple ? '✨ Everything' : '🌱 Simple'}</button><button class="chip" data-act="focus">🧘 Focus mode</button><button class="chip" data-act="helpToggle">${state.settings.help === false ? '❔ Help off' : '❓ Help on'}</button><button class="chip" data-act="theme">${['light', 'forest', 'sunset'].includes(s.theme) ? '🌙 Dark' : '☀️ Light'}</button></div></div>
@@ -1217,6 +1218,8 @@ function welcomeBack(force) {
     <div class="row" style="margin-top:20px;flex-wrap:wrap"><button class="how" data-act="close">Later</button><span style="flex:1"></span><button class="btn" data-act="wbSave">Update everything</button></div></div>`);
 }
 /* ---------- render ---------- */
+// shown at the top of every screen in the free demo, so demos that open on Debt, Calendar etc. still say so
+function demoBanner() { return DEMO ? `<div class="banner"><span>✨ <b>Free demo</b>: every screen, no watermark. Log up to ${DEMO_LIMIT} spends (${Math.max(0, DEMO_LIMIT - state.spends.filter(x => x.ts).length)} left).</span><span class="row"><a class="btn sm" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></span></div>` : ''; }
 function render() {
   document.documentElement.dataset.theme = state.settings.theme;
   const base = navBase();
@@ -1227,7 +1230,7 @@ function render() {
   const tabs = state.settings.simple ? ['today', 'spend', 'bills', 'cal', 'settings'] : (ED.tabs || ['today', 'spend', 'bills', 'cal', 'debt']), inMore = !tabs.includes(view);
   $('#tabbar').innerHTML = tabs.map(k => VIEWS.find(v => v[0] === k)).filter(Boolean).map(([k, t]) => `<button class="${view === k ? 'on' : ''}" data-go="${k}">${I[k]}<span>${t}</span></button>`).join('') +
     `<button class="${inMore ? 'on' : ''}" data-act="more">${I.more}<span>More</span></button>`;
-  $('#main').innerHTML = ({ today: vToday, spend: vSpend, income: vIncome, env: vEnv, chal: vChal, bills: vBills, cal: vCal, debt: vDebt, goals: vGoals, month: vMonth, settings: vSettings })[view]();
+  $('#main').innerHTML = (view !== 'today' ? demoBanner() : '') + ({ today: vToday, spend: vSpend, income: vIncome, env: vEnv, chal: vChal, bills: vBills, cal: vCal, debt: vDebt, goals: vGoals, month: vMonth, settings: vSettings })[view]();
   const m = $('#main'); m.classList.toggle('enter', render.last !== view); render.last = view;
   bindInputs();
 }
