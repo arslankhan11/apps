@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1020">
+<title>Calm Money · Budget & Debt Planner</title>
+<style>
+:root{
+  --bg:#0e0f1d; --bg2:#14162a; --surface:#191c33; --surface2:#222640; --line:#2c3150;
+  --text:#eef0ff; --muted:#9aa0c6; --faint:#6b7199;
+  --accent:#ff9f7a; --accent-soft:rgba(255,159,122,.14); --mint:#7ee0c3; --mint-soft:rgba(126,224,195,.14);
+  --lav:#b7a7ff; --lav-soft:rgba(183,167,255,.14); --gold:#ffd27a; --danger:#ff7d8e;
+  --shadow:0 10px 30px rgba(0,0,0,.35); --radius:20px;
+  --serif:"Fraunces","Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --sans:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+}
+[data-theme="light"]{
+  --bg:#f6f2ec; --bg2:#efe9e1; --surface:#ffffff; --surface2:#f7f3ee; --line:#e7dfd4;
+  --text:#1f1c2e; --muted:#6c6680; --faint:#9c96ad;
+  --accent:#e06b3d; --accent-soft:rgba(224,107,61,.12); --mint:#1c9c84; --mint-soft:rgba(28,156,132,.12);
+  --lav:#6f5cd6; --lav-soft:rgba(111,92,214,.1); --gold:#c8901c; --danger:#d4485c;
+  --shadow:0 8px 24px rgba(60,40,20,.08);
+}
+/* extra named themes, available in every app (html[...] wins over an edition's own colours) */
+html[data-theme="ocean"]{--bg:#081521;--bg2:#0c1d2d;--surface:#10263a;--surface2:#163149;--line:#22415d;--text:#e8f4ff;--muted:#93b4cf;--faint:#5f7f9a;--accent:#4cc3ff;--accent-soft:rgba(76,195,255,.14);--mint:#56e0c2;--mint-soft:rgba(86,224,194,.14);--lav:#7aa8ff;--lav-soft:rgba(122,168,255,.14);--gold:#ffd27a;--danger:#ff7d8e}
+html[data-theme="sunset"]{--bg:#fff5ee;--bg2:#fbe9df;--surface:#ffffff;--surface2:#fff3ec;--line:#f3d9cc;--text:#2c1712;--muted:#80594d;--faint:#b3918a;--accent:#e2553a;--accent-soft:rgba(226,85,58,.12);--mint:#2a9d78;--mint-soft:rgba(42,157,120,.12);--lav:#c2477f;--lav-soft:rgba(194,71,127,.1);--gold:#d08a17;--danger:#c93a4f}
+html[data-theme="forest"]{--bg:#f2f6ef;--bg2:#e7efe2;--surface:#ffffff;--surface2:#f1f6ee;--line:#d6e3cf;--text:#18261a;--muted:#5b6f5c;--faint:#93a493;--accent:#4f8a3a;--accent-soft:rgba(79,138,58,.12);--mint:#2f8f66;--mint-soft:rgba(47,143,102,.12);--lav:#6c7fd1;--lav-soft:rgba(108,127,209,.1);--gold:#b98a17;--danger:#c7454f}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;background:radial-gradient(1200px 600px at 80% -10%,var(--lav-soft),transparent 60%),radial-gradient(900px 500px at -10% 110%,var(--accent-soft),transparent 60%),var(--bg);background-attachment:fixed}
+button,input,select{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+/* sidebar */
+.side{position:sticky;top:0;height:100vh;padding:28px 18px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--bg2) 70%,transparent);backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;align-items:center;gap:10px;margin:0 8px 26px}
+.brand .logo{width:38px;height:38px;border-radius:12px;background:conic-gradient(from 200deg,var(--accent),var(--lav),var(--mint),var(--accent));display:grid;place-items:center;box-shadow:var(--shadow)}
+.brand .logo span{width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.brand b{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.2px}
+.brand small{display:block;color:var(--muted);font-size:11px;letter-spacing:.6px;text-transform:uppercase}
+.nav{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:14px;color:var(--muted);cursor:pointer;border:0;background:none;text-align:left;width:100%;font-size:14.5px;transition:.15s}
+.nav svg{width:19px;height:19px;flex:none}
+.nav:hover{background:var(--surface);color:var(--text)}
+.nav.on{background:var(--surface2);color:var(--text);box-shadow:inset 3px 0 0 var(--accent)}
+.side .spacer{flex:1}
+.side .mini{font-size:12px;color:var(--faint);padding:0 12px;line-height:1.5}
+/* main */
+main{padding:32px clamp(16px,3vw,44px) 110px;max-width:1240px;width:100%}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.hello{font-family:var(--serif);font-size:clamp(26px,3vw,36px);font-weight:500;margin:0;line-height:1.1}
+.sub{color:var(--muted);margin-top:6px;font-size:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#1b1224;font-weight:600}
+.grid{display:grid;gap:18px}
+.grid>*{min-width:0}
+main{min-width:0;overflow-x:hidden}
+.card h3{flex-wrap:wrap;gap:6px}
+.g-hero{grid-template-columns:1.25fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card h3{margin:0 0 14px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.card h2{font-family:var(--serif);font-weight:500;margin:0 0 4px;font-size:22px}
+.big{font-family:var(--serif);font-size:34px;font-weight:600;letter-spacing:-.5px}
+.muted{color:var(--muted)} .faint{color:var(--faint)} .small{font-size:13px} .tiny{font-size:11.5px}
+.pos{color:var(--mint)} .neg{color:var(--danger)} .acc{color:var(--accent)}
+.hero{background:linear-gradient(160deg,var(--surface2),var(--surface));display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 22px 22px}
+.gauge{width:min(340px,100%);display:block}
+.hero .pace{margin-top:-6px;color:var(--muted);font-size:14px}
+.hero .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-top:18px}
+.trio div{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 6px}
+.trio small{display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.trio b{font-size:15px}
+.mood{margin-top:14px;font-family:var(--serif);font-style:italic;color:var(--text);font-size:16px}
+.one{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:var(--mint-soft);border:1px solid color-mix(in srgb,var(--mint) 35%,transparent);margin-bottom:18px}
+.one .dot{width:40px;height:40px;border-radius:12px;background:var(--mint);color:#062a22;display:grid;place-items:center;flex:none}
+.one b{display:block}
+.one .grow{flex:1}
+.btn{border:0;border-radius:12px;padding:10px 16px;background:var(--accent);color:#1b1224;font-weight:650;cursor:pointer;transition:.15s;white-space:nowrap}
+.btn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text);font-weight:500}
+.btn.ghost:hover{border-color:var(--accent)}
+.btn.mint{background:var(--mint);color:#062a22}
+.btn.sm{padding:7px 12px;font-size:13px;border-radius:10px}
+.btn.danger{background:transparent;border:1px solid var(--danger);color:var(--danger)}
+.row{display:flex;align-items:center;gap:12px}
+.list{display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:14px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;background:var(--surface2)}
+.item .grow{flex:1;min-width:0}
+.item .t{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .s{font-size:12.5px;color:var(--muted)}
+.item .amt{font-weight:650;font-variant-numeric:tabular-nums}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--lav-soft);color:var(--lav);white-space:nowrap}
+.tag.warn{background:var(--accent-soft);color:var(--accent)}
+.tag.ok{background:var(--mint-soft);color:var(--mint)}
+.bar{height:9px;border-radius:99px;background:var(--bg2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--mint),var(--lav))}
+.bar.over i{background:linear-gradient(90deg,var(--accent),var(--danger))}
+.stat{display:flex;flex-direction:column;gap:4px}
+.stat .big{font-size:28px}
+.empty{padding:26px;text-align:center;color:var(--muted);font-size:14px}
+/* forms */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);letter-spacing:.3px}
+label.f{min-width:0}
+.f input,.f select{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none;min-width:0;width:100%}
+.f input::placeholder,.wb::placeholder,#newCat::placeholder,#qa::placeholder{color:var(--faint);opacity:.55;font-style:italic}
+.bad{border-color:var(--danger)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 25%,transparent)!important;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.f input:focus,.f select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;background:none;padding:8px 14px;border-radius:9px;cursor:pointer;color:var(--muted);font-size:13.5px}
+.seg button.on{background:var(--surface2);color:var(--text);box-shadow:0 1px 0 var(--line)}
+.bigin{font-family:var(--serif);font-size:30px!important;padding:14px 16px!important}
+.x{border:0;background:none;color:var(--faint);cursor:pointer;font-size:18px;padding:4px 6px;border-radius:8px}
+.x:hover{color:var(--danger);background:var(--surface2)}
+.check{width:26px;height:26px;border-radius:9px;border:2px solid var(--line);background:none;cursor:pointer;display:grid;place-items:center;flex:none;color:transparent;transition:.15s}
+.check:hover{border-color:var(--mint)}
+.check.on{background:var(--mint);border-color:var(--mint);color:#062a22}
+.banner{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:linear-gradient(90deg,var(--lav-soft),var(--accent-soft));border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin-bottom:18px;font-size:14px}
+.chart{width:100%;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.how{font-size:12.5px;color:var(--muted);cursor:pointer;text-decoration:underline dotted;background:none;border:0;padding:0}
+.explain{margin-top:10px;font-size:13px;color:var(--muted);text-align:left;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%;line-height:1.7}
+.explain div{display:flex;justify-content:space-between}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:11px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(5,6,15,.55);display:none;align-items:center;justify-content:center;z-index:40;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:min(560px,100%);max-height:90vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.modal .card::-webkit-scrollbar{width:8px}.modal .card::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}.modal .card::-webkit-scrollbar-track{background:transparent}
+.ring{width:84px;height:84px;flex:none}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:center;padding:4px 0}
+.cd{min-height:96px;border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:8px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;cursor:pointer;text-align:left;overflow:hidden;transition:.15s}
+.cd:hover{border-color:var(--accent)}
+.cd.blank{background:none;border:0;cursor:default}
+.cd.past{opacity:.6}
+.cd.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.cd.sel{background:var(--surface2);border-color:var(--accent)}
+.cd .n{font-weight:700;font-size:13px}
+.cd .pay{font-size:11px;background:var(--mint-soft);color:var(--mint);border-radius:6px;padding:1px 5px;font-weight:600}
+.cd .pay em,.cd .bl em{font-style:normal}
+.cd .bl{font-size:11px;display:flex;align-items:center;gap:5px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.cd .bl i{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.cd .bl.paid i{background:var(--mint)}
+.cd .bl.gone i{background:var(--faint)}
+.cd .bl.paid em{text-decoration:line-through;color:var(--muted)}
+.cd .more{font-size:10.5px;color:var(--muted)}
+.cd .sp{margin-top:auto;font-size:11px;color:var(--lav);font-weight:600}
+@media (max-width:760px){.cd{min-height:62px;padding:5px;border-radius:10px}.cd .bl em,.cd .pay em{display:none}.cd .bl{display:inline-flex}.cd .sp{font-size:9.5px}.calgrid{gap:4px}}
+.hq{width:20px;height:20px;border-radius:50%;border:1px solid var(--lav);background:var(--lav-soft);color:var(--lav);font-size:11px;font-weight:700;cursor:pointer;display:inline-grid;place-items:center;padding:0;vertical-align:middle;margin-left:6px;line-height:1}
+.hq:hover{background:var(--lav);color:var(--bg)}
+.card h3>span{display:inline-flex;align-items:center}
+.check[disabled]{cursor:default}
+.whatif{margin-top:14px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.boxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.box{border:1px solid var(--line);background:var(--bg2);border-radius:10px;padding:10px 2px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;transition:.15s}
+.box:hover{border-color:var(--mint)}
+.box.on{background:var(--mint);border-color:var(--mint);color:#062a22}
+.boxes.nospend .box{cursor:default}
+.box.won{background:var(--mint-soft);border-color:var(--mint);color:var(--mint)}
+.box.spent{background:var(--accent-soft);color:var(--accent)}
+.box.today{border-color:var(--accent);color:var(--text)}
+.box.future{opacity:.45}
+.toast.act{pointer-events:auto}
+.toast .undo{margin-left:10px;border:0;background:var(--accent);color:#1b1224;border-radius:8px;padding:4px 10px;font-weight:700;cursor:pointer}
+.dots{display:flex;gap:6px;margin-bottom:18px}
+.dots i{flex:1;height:5px;border-radius:9px;background:var(--line);transition:.3s}
+.dots i.on{background:linear-gradient(90deg,var(--mint),var(--lav))}
+.wz h2{font-size:26px;margin-top:6px}
+.wz-emoji{font-size:34px}
+.wb{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%;min-width:0}
+.wb:focus{outline:none;border-color:var(--accent)}
+.tap{cursor:pointer;transition:.15s}
+.tap:hover{border-color:var(--accent)!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+main.enter>*{animation:rise .35s ease both}
+main.enter>*:nth-child(2){animation-delay:.04s}main.enter>*:nth-child(3){animation-delay:.08s}main.enter>*:nth-child(4){animation-delay:.12s}main.enter>*:nth-child(5){animation-delay:.16s}
+.modal.on .card{animation:rise .25s ease both}
+@keyframes sweep{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+main.enter .gauge .arc{stroke-dasharray:var(--len);animation:sweep 1s cubic-bezier(.2,.8,.2,1) both}
+@media print{body{background:#fff!important;color:#111}.side,.tabbar,.toast,.modal,.hide-print,.chips,.banner,.btn,.hq{display:none!important}.app{display:block}main{padding:0;max-width:none}.card{box-shadow:none;border-color:#ccc;break-inside:avoid;background:#fff}}{*{animation:none!important;transition:none!important}}
+.focus .hide-in-focus{display:none!important}
+.tabbar{display:none}
+@media (max-width:980px){.g-hero,.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  main{padding:20px 16px 110px}
+  .g3{grid-template-columns:1fr}
+  .toast{bottom:96px}
+  .tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;background:color-mix(in srgb,var(--bg2) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));justify-content:space-around}
+  .tabbar button{border:0;background:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;padding:4px 2px;cursor:pointer;flex:1;min-width:0}
+  .tabbar button svg{width:21px;height:21px}
+  .tabbar button.on{color:var(--accent)}
+  .big{font-size:28px}
+  .hero .trio b{font-size:13.5px}
+  .item{gap:10px}
+  .item .btn.ghost.sm{display:none}
+  .item .t{white-space:normal}
+  .one{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="side">
+    <div class="brand"><div class="logo"><span></span></div><div><b id="brandName">Calm Money</b><small id="brandSub">Budget & debt planner</small></div></div>
+    <div id="nav"></div>
+    <div class="spacer"></div>
+    <div class="mini">Your numbers stay on this device.<br>No account. No subscription.</div>
+  </aside>
+  <main id="main"></main>
+</div>
+<nav class="tabbar" id="tabbar"></nav>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal"><div class="card" id="modalCard"></div></div>
+
+<script>
+/* ============ Calm Money · single-file offline budget app ============ */
+// the free demo is the same app with window.CALM_DEMO set (see build/make-demo.js)
+const DEMO = !!window.CALM_DEMO, DEMO_LIMIT = 40, SHOP_URL = 'https://www.etsy.com/shop/AuraPixelLab';
+// editions: the same engine sold as separate apps; build/make-editions.js sets window.EDITION per app
+const ED = Object.assign({ key: 'calm-money-v1', name: 'Calm Money', sub: 'Budget & debt planner', theme: 'dark', home: 'today', todayOrder: null, nav: null, css: '' }, window.EDITION || {});
+if (ED.css) { const st = document.createElement('style'); st.textContent = ED.css; document.head.appendChild(st); }
+const KEY = DEMO ? ED.key + '-demo' : ED.key;
+const demoBlocked = () => DEMO && state.spends.filter(x => x.ts).length >= DEMO_LIMIT;
+function demoWall() { modal(`<div class="wz"><div class="wz-emoji">💛</div><h2>That's the free demo's ${DEMO_LIMIT} spends</h2><p class="muted" style="line-height:1.6">Hope it already feels calmer. Everything you typed stays readable here. The full planner has no limits, works offline from your Home Screen, and opens your backup file so nothing is lost.</p><div class="row" style="margin-top:18px"><button class="btn ghost" data-act="backup">Download my backup</button><span style="flex:1"></span><a class="btn" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></div></div>`); }
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const DAY = 86400000;
+
+/* ---------- dates (local, midnight) ---------- */
+const d0 = (d = new Date()) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const parse = s => { if (!s) return null; const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const dim = (y, m) => new Date(y, m + 1, 0).getDate();
+const onDay = (y, m, day) => new Date(y, m, Math.min(day, dim(y, m)));
+const addMonths = (d, n, day = d.getDate()) => onDay(d.getFullYear(), d.getMonth() + n, day);
+const daysBetween = (a, b) => Math.round((d0(b) - d0(a)) / DAY);
+const fmtD = (d, o = { weekday: 'short', day: 'numeric', month: 'short' }) => d ? d.toLocaleDateString(undefined, o) : '';
+const monthKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+/* ---------- demo data ---------- */
+function demo() {
+  const t = d0();
+  const back = n => iso(addDays(t, -n));
+  const S = [
+    [0, 12.4, 'Eating out', 'Lunch'], [1, 64.3, 'Groceries', 'Weekly shop'], [1, 6.5, 'Treats', 'Coffee'],
+    [2, 40, 'Transport', 'Fuel'], [3, 18.99, 'Fun', 'Cinema'], [4, 9.4, 'Groceries', 'Milk & bread'],
+    [5, 35, 'Kids', 'School trip'], [7, 71.2, 'Groceries', 'Weekly shop'], [8, 22, 'Eating out', 'Pizza night'],
+    [9, 14.99, 'Health', 'Pharmacy'], [11, 29, 'Shopping', 'Birthday card & gift'], [12, 58.1, 'Groceries', 'Weekly shop'],
+    [13, 5.2, 'Treats', 'Coffee'],
+  ].map(([n, a, c, note]) => ({ id: uid(), date: back(n), amount: a, cat: c, note }));
+  const payAnchor = iso(addDays(t, -11));
+  const o = {
+    demo: true,
+    settings: { name: 'Alex', currency: 'USD', theme: ED.theme, simple: false, balance: 1850, balanceDate: iso(t), balanceTs: Date.now(), aside: 300, cushion: 100,
+      payFreq: 'biweekly', payAmount: 2100, payAnchor, payDay1: 1, payDay2: 15 },
+    bills: [
+      { id: uid(), name: 'Rent', amount: 1200, freq: 'monthly', day1: 1, cat: 'Home', paidThrough: null },
+      { id: uid(), name: 'Car loan', amount: 245, freq: 'monthly', day1: 5, cat: 'Debt', paidThrough: null },
+      { id: uid(), name: 'Streaming', amount: 15.49, freq: 'monthly', day1: 8, cat: 'Subscriptions', paidThrough: null },
+      { id: uid(), name: 'Phone', amount: 55, freq: 'monthly', day1: 12, cat: 'Phone & internet', paidThrough: null },
+      { id: uid(), name: 'Credit card minimum', amount: 85, freq: 'monthly', day1: 18, cat: 'Debt', paidThrough: null },
+      { id: uid(), name: 'Electric', amount: 90, freq: 'monthly', day1: 20, cat: 'Utilities', paidThrough: null },
+      { id: uid(), name: 'Internet', amount: 60, freq: 'monthly', day1: 25, cat: 'Phone & internet', paidThrough: null },
+      { id: uid(), name: 'Childcare', amount: 150, freq: 'biweekly', anchor: iso(addDays(t, -3)), cat: 'Kids', paidThrough: null },
+      { id: uid(), name: 'Car insurance', amount: 372, freq: 'months', anchor: iso(addMonths(t, 1)), every: 6, smooth: true, cat: 'Insurance', paidThrough: null },
+      { id: uid(), name: 'Water', amount: 38, freq: 'twice', day1: 3, day2: 17, cat: 'Utilities', paidThrough: null },
+    ],
+    spends: S,
+    budgets: { Groceries: 520, 'Eating out': 120, Transport: 160, Fun: 80, Shopping: 60, Health: 40, Kids: 80, Treats: 30, Other: 50 },
+    debts: [
+      { id: uid(), name: 'Store card', balance: 640, start: 900, apr: 26.99, min: 25, payments: [] },
+      { id: uid(), name: 'Credit card', balance: 3200, start: 3800, apr: 21.49, min: 85, payments: [] },
+      { id: uid(), name: 'Medical bill', balance: 450, apr: 0, min: 30 },
+      { id: uid(), name: 'Car loan', balance: 8900, apr: 6.9, min: 245 },
+      { id: uid(), name: 'Student loan', balance: 12400, apr: 4.5, min: 130 },
+    ],
+    debtMethod: 'snowball', debtExtra: 150,
+    goals: [
+      { id: uid(), name: 'Emergency fund', target: 1000, saved: 300, monthly: 50, emoji: '🛟' },
+      { id: uid(), name: 'Holiday', target: 1200, saved: 150, monthly: 75, emoji: '🌴' },
+      { id: uid(), name: 'New laptop', target: 900, saved: 420, monthly: 40, emoji: '💻' },
+    ],
+    dump: [],
+  };
+  const out = ED.demoPatch ? ED.demoPatch(o, { uid, iso, d0, addDays, addMonths }) || o : o;
+  out.bills.forEach(b => settlePast(b)); // example bills before today count as paid
+  return out;
+}
+function blank() {
+  const t = d0();
+  return { demo: false,
+    settings: { name: '', currency: 'USD', theme: state?.settings?.theme || ED.theme, simple: false, balance: 0, balanceDate: iso(t), balanceTs: Date.now(), aside: 0, cushion: 0,
+      payFreq: 'biweekly', payAmount: 0, payAnchor: iso(t), payDay1: 1, payDay2: 15 },
+    bills: [], spends: [], budgets: { Groceries: 0, 'Eating out': 0, Transport: 0, Fun: 0, Other: 0 }, debts: [], debtMethod: 'snowball', debtExtra: 0, goals: [], dump: [] };
+}
+
+let state;
+try { state = JSON.parse(localStorage.getItem(KEY)); } catch (e) { state = null; }
+if (!state) state = demo();
+let view = VIEWS_FROM_HASH();
+function VIEWS_FROM_HASH() { const h = location.hash.slice(1).split('-'); if (h[1] === 'light' || h[1] === 'dark') state.settings.theme = h[1]; return ['today', 'spend', 'income', 'env', 'chal', 'bills', 'cal', 'debt', 'goals', 'month', 'settings'].includes(h[0]) ? h[0] : ED.home; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+
+/* ---------- money ---------- */
+const CURR = ['USD', 'GBP', 'EUR', 'CAD', 'AUD', 'NZD', 'INR', 'PKR', 'ZAR', 'PLN', 'SEK', 'JPY', 'AED'];
+function money(n, dp = 2) {
+  try { return new Intl.NumberFormat(undefined, { style: 'currency', currency: state.settings.currency, minimumFractionDigits: dp, maximumFractionDigits: dp }).format(n || 0); }
+  catch (e) { return (n || 0).toFixed(dp); }
+}
+const num = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, '')); return isNaN(n) ? 0 : n; };
+
+/* ---------- pay & bills engine ---------- */
+// every income: the main pay from Setup plus any extra paychecks (second job, partner, benefits)
+function incomes() {
+  const s = state.settings;
+  return [{ id: 'main', name: state.extraIncomes?.length ? 'Main pay' : 'Pay', amount: s.payVariable && +s.payLowest > 0 ? +s.payLowest : +s.payAmount || 0, freq: s.payFreq, anchor: s.payAnchor, day1: s.payDay1, day2: s.payDay2, early: !!s.payEarly, split: +s.paySplit || 0 }, ...(state.extraIncomes || [])];
+}
+// what actually reaches the spending account after any automatic % split to savings
+const net = i => (+i.amount || 0) * (1 - Math.min(100, Math.max(0, +i.split || 0)) / 100);
+// paid early when payday is a weekend: move Sat/Sun to the Friday before
+const shiftEarly = (d, early) => !early ? d : d.getDay() === 6 ? addDays(d, -1) : d.getDay() === 0 ? addDays(d, -2) : d;
+// dates an income lands on within [from, to)
+function payDates(inc, from, to) {
+  const raw = [], f = addDays(from, -3), t = addDays(to, 3);
+  if (inc.freq === 'weekly' || inc.freq === 'biweekly') {
+    const step = inc.freq === 'weekly' ? 7 : 14, a = parse(inc.anchor) || d0();
+    for (let d = addDays(a, Math.floor(daysBetween(a, f) / step) * step); d < t; d = addDays(d, step)) raw.push(d);
+  } else {
+    for (let m = -1; m < 26; m++) {
+      const y = f.getFullYear(), mo = f.getMonth() + m;
+      if (onDay(y, mo, 1) >= t) break;
+      for (const day of inc.freq === 'twice' ? [+inc.day1 || 1, +inc.day2 || 15] : [+inc.day1 || 1]) raw.push(onDay(y, mo, day));
+    }
+  }
+  return raw.map(d => shiftEarly(d, inc.early)).filter(d => d >= from && d < to).sort((a, b) => a - b);
+}
+function nextPayday(from = d0()) {
+  const f = addDays(d0(from), 1);
+  const next = incomes().map(i => payDates(i, f, addDays(f, 70))[0]).filter(Boolean).sort((a, b) => a - b)[0];
+  return next || addDays(d0(from), 30);
+}
+function prevPayday() {
+  const t = d0();
+  const last = incomes().map(i => payDates(i, addDays(t, -70), addDays(t, 1)).pop()).filter(Boolean).sort((a, b) => b - a)[0];
+  return last || addDays(t, -30);
+}
+const perMonth = i => net(i) * ({ weekly: 52 / 12, biweekly: 26 / 12, twice: 2, monthly: 1 }[i.freq] || 1);
+const payPerMonth = () => incomes().reduce((s, i) => s + perMonth(i), 0);
+const moneyInSince = from => incomes().reduce((s, i) => s + payDates(i, from, addDays(d0(), 1)).length * net(i), 0)
+  + (state.moneyIn || []).filter(x => parse(x.date) >= from && parse(x.date) <= d0()).reduce((s, x) => s + x.amount, 0);
+
+// every date a bill falls on within [from, to)
+function occurrences(b, from, to) {
+  const out = [], f = d0(from);
+  const push = d => { if (d >= f && d < to) out.push(d); };
+  if (b.freq === 'monthly' || b.freq === 'twice') {
+    for (let m = -1; m < 14; m++) {
+      const y = f.getFullYear(), mo = f.getMonth() + m;
+      push(onDay(y, mo, +b.day1 || 1)); if (b.freq === 'twice') push(onDay(y, mo, +b.day2 || 15));
+      if (onDay(y, mo, 1) > to) break;
+    }
+  } else if (b.freq === 'weekly' || b.freq === 'biweekly') {
+    const step = b.freq === 'weekly' ? 7 : 14, a = parse(b.anchor) || f;
+    let k = Math.floor(daysBetween(a, f) / step); let d = addDays(a, k * step);
+    for (let i = 0; i < 200 && d < to; i++, d = addDays(d, step)) push(d);
+  } else if (b.freq === 'months') {
+    const a = parse(b.anchor) || f, n = Math.max(1, +b.every || 1);
+    for (let k = -30; k < 60; k++) { const d = addMonths(a, k * n, a.getDate()); if (d >= to) break; push(d); }
+  } else if (b.freq === 'once') { const d = parse(b.anchor); if (d) push(d); }
+  return out.sort((x, y) => x - y);
+}
+const unpaid = (b, list) => list.filter(d => !b.paidThrough || d > parse(b.paidThrough));
+// a bill whose date has passed but isn't ticked stays 'due' (overdue) until it's marked paid
+const OVERDUE_DAYS = 60;
+function nextDue(b) { const o = unpaid(b, occurrences(b, addDays(d0(), -OVERDUE_DAYS), addMonths(d0(), 13))); return o[0] || null; }
+// when a bill is first added, anything before today is treated as already paid
+function settlePast(b) { const last = occurrences(b, addDays(d0(), -360), d0()).pop(); /* occurrences() spans about 13 months */ if (last && (!b.paidThrough || iso(last) > b.paidThrough)) b.paidThrough = iso(last); return b; }
+const isOverdue = d => d && d < d0();
+function billMonthly(b) {
+  return b.amount * ({ monthly: 1, twice: 2, weekly: 52 / 12, biweekly: 26 / 12, months: 1 / Math.max(1, +b.every || 1), once: 0 }[b.freq] || 0);
+}
+const FREQ_TXT = { monthly: 'Once a month', twice: 'Twice a month', biweekly: 'Every 2 weeks', weekly: 'Every week', months: 'Every few months', once: 'Just once' };
+// safe-to-spend runs to the MAIN payday; smaller incomes landing before it count as money coming in
+function mainPayday() { const t = addDays(d0(), 1); return payDates(incomes()[0], t, addDays(t, 70))[0] || addDays(d0(), 30); }
+/* ---------- bank accounts ----------
+   Off by default: one account built from Setup's balance. Turned on, each account keeps its own
+   balance and check-in time; bills, spends and incomes say which account they use (blank = first spending account). */
+// file-name friendly version of the planner's name (for backups and CSV exports)
+const slug = () => (state.settings.title || ED.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const multi = () => (state.accounts || []).length > 0;
+function accts() {
+  if (multi()) return state.accounts;
+  const s = state.settings;
+  return [{ id: 'main', name: 'Bank', type: 'spending', balance: +s.balance || 0, balanceDate: s.balanceDate, balanceTs: s.balanceTs || 0 }];
+}
+// credit cards: bills and spends charged to a card don't touch the bank; the card's own payment is a bill from checking
+const spendAccts = () => accts().filter(a => a.type !== 'savings' && a.type !== 'credit');
+const cardAccts = () => accts().filter(a => a.type === 'credit');
+const cardCharges = a => state.spends.filter(x => !x.fromDeleted && acctOf(x) === a.id && (x.ts || 0) > (a.balanceTs || 0)).reduce((s, x) => s + x.amount, 0) + (state.paidLog || []).filter(x => !x.fromDeleted && acctOf(x) === a.id && x.ts > (a.balanceTs || 0)).reduce((s, x) => s + x.amount, 0);
+const defaultAcct = () => (spendAccts()[0] || accts()[0] || { id: 'main' }).id;
+// which account an item belongs to; anything pointing at a deleted account falls back to the default
+const acctOf = x => { const id = x && x.account; return id && accts().some(a => a.id === id) ? id : defaultAcct(); };
+const acctName = id => (accts().find(a => a.id === id) || {}).name || 'Bank';
+const incomeAcct = i => i.id === 'main' ? acctOf({ account: state.settings.payAccount }) : acctOf(i);
+function acctSelect(id, selected, label = 'From account') {
+  if (!multi()) return '';
+  return `<label class="f">${label}<select id="${id}">${accts().map(a => `<option value="${a.id}" ${a.id === (selected || defaultAcct()) ? 'selected' : ''}>${esc(a.name)}${a.type === 'savings' ? ' (savings)' : a.type === 'credit' ? ' (credit card, owed)' : ''}</option>`).join('')}</select></label>`;
+}
+// one balance box per account (used by "update balance" and the welcome-back screen)
+function balanceInputs(prefill) {
+  return `<div class="form" style="grid-template-columns:1fr 1fr;margin-top:12px">${accts().map((a, i) => `<label class="f">${esc(a.name)}${a.type === 'savings' ? ' (savings)' : a.type === 'credit' ? ' (credit card, owed)' : ''}<input data-ub="${a.id}" inputmode="decimal" ${prefill ? `value="${a.balance}"` : `placeholder="e.g. ${a.balance}"`} ${i === 0 ? 'autofocus' : ''}></label>`).join('')}</div>`;
+}
+function billsBeforePayday(acctId) {
+  const t = d0(), p = mainPayday(); let total = 0; const rows = [];
+  for (const b of state.bills) {
+    if (acctId && acctOf(b) !== acctId) continue;
+    // smoothed bills: hold back the monthly share instead of the lump
+    if (b.freq === 'months' && b.smooth) continue;
+    const occ = unpaid(b, occurrences(b, addDays(t, -OVERDUE_DAYS), p));
+    if (occ.length) { total += occ.length * b.amount; rows.push({ b, occ }); }
+  }
+  return { total, rows };
+}
+function smoothedHoldBack() {
+  // set aside a share of big irregular bills for each pay period
+  const per = { weekly: 12 / 52, biweekly: 12 / 26, twice: .5, monthly: 1 }[state.settings.payFreq] || 1;
+  return state.bills.filter(b => b.freq === 'months' && b.smooth).reduce((s, b) => s + billMonthly(b) * per, 0);
+}
+// money that left the account after the balance was checked: spends dated later, or logged later the same day, plus bills ticked off since
+function spentSince(a) {
+  const d = parse(a.balanceDate), bts = a.balanceTs || 0, mine = x => !x.fromDeleted && acctOf(x) === a.id;
+  const after = x => parse(x.date) > d || (x.date === a.balanceDate && (x.ts || 0) > bts);
+  return state.spends.filter(x => mine(x) && after(x)).reduce((s, x) => s + x.amount, 0)
+    + (state.paidLog || []).filter(x => mine(x) && x.ts > bts).reduce((s, x) => s + x.amount, 0);
+}
+function safe() {
+  const s = state.settings, p = mainPayday(), days = Math.max(1, daysBetween(d0(), p)), billHold = smoothedHoldBack(), gHold = goalHold(), tHold = taxHold(), hold = billHold + gHold + tHold;
+  const extra = state.extraIncomes || [];
+  // each spending account: balance, minus what left it since the check-in, plus income logged since, minus its bills, plus other pay landing in it before payday
+  const per = spendAccts().map(a => {
+    const since = spentSince(a), got = loggedIn(a), bills = billsBeforePayday(a.id).total;
+    const extraIn = got + extra.filter(i => incomeAcct(i) === a.id).reduce((t, i) => t + payDates(i, addDays(d0(), 1), p).length * net(i), 0);
+    return { a, since, got, bills, extraIn, left: a.balance - since - bills + extraIn };
+  });
+  const sum = k => per.reduce((t, x) => t + x[k], 0);
+  const balance = per.reduce((t, x) => t + x.a.balance, 0), since = sum('since'), bills = sum('bills'), extraIn = sum('extraIn'), got = sum('got');
+  const total = balance - since - bills - s.aside - s.cushion - hold + extraIn;
+  const savings = accts().filter(a => a.type === 'savings');
+  return { total, perDay: total / days, days, p, since, got, bills, hold, billHold, gHold, tHold, extraIn, aside: s.aside, cushion: s.cushion, balance, per, savings };
+}
+
+/* ---------- 45-day forecast ----------
+   Starts from what's in the spending accounts now, adds every paycheck (after any split) on the day it lands,
+   takes every unpaid bill on the day it falls, and an everyday spending pace from the last 30 days. */
+function spendPace() {
+  const from = addDays(d0(), -30), sp = state.spends.filter(x => parse(x.date) >= from && !x.fromDeleted);
+  if (!sp.length) return 0;
+  const first = sp.reduce((m, x) => x.date < m ? x.date : m, iso(d0()));
+  return sp.reduce((a, x) => a + x.amount, 0) / Math.max(7, daysBetween(parse(first), d0()) + 1);
+}
+function forecast(whatIf = 0, days = 45) {
+  const sf = safe(), pace = spendPace(), start = d0();
+  let bal = sf.balance - sf.since + sf.got - whatIf;
+  const ev0 = whatIf ? [`What if: −${money(whatIf)}`] : [];
+  // bills still unpaid today come off today (today's pay is assumed to be in the balance already)
+  for (const b of state.bills) { const n = unpaid(b, occurrences(b, addDays(start, -OVERDUE_DAYS), addDays(start, 1))).length; if (n && spendAccts().some(a => a.id === acctOf(b))) { bal -= n * b.amount; ev0.push(`−${money(n * b.amount, 0)} ${b.name}`); } }
+  const pts = [{ d: start, bal, ev: ev0 }];
+  for (let i = 1; i <= days; i++) {
+    const d = addDays(start, i), ev = [];
+    for (const inc of incomes()) if (payDates(inc, d, addDays(d, 1)).length && spendAccts().some(a => a.id === incomeAcct(inc))) { bal += net(inc); ev.push(`+${money(net(inc), 0)} ${inc.name}`); }
+    for (const b of state.bills) if (unpaid(b, occurrences(b, d, addDays(d, 1))).length && spendAccts().some(a => a.id === acctOf(b))) { bal -= b.amount; ev.push(`−${money(b.amount, 0)} ${b.name}`); }
+    bal -= pace;
+    pts.push({ d, bal, ev });
+  }
+  const low = pts.reduce((m, p) => p.bal < m.bal ? p : m, pts[0]);
+  return { pts, low, pace, end: pts[pts.length - 1].bal };
+}
+function forecastChart(fc, h = 210) {
+  const W = 640, pl = 52, pr = 14, pt = 14, pb = 26, vals = fc.pts.map(p => p.bal);
+  const max = Math.max(10, ...vals), min = Math.min(0, ...vals), rng = max - min || 1;
+  const X = i => pl + i / (fc.pts.length - 1) * (W - pl - pr), Y = v => pt + (1 - (v - min) / rng) * (h - pt - pb);
+  const line = fc.pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(p.bal).toFixed(1)}`).join(' ');
+  const zero = min < 0 ? `<line x1="${pl}" x2="${W - pr}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--danger)" stroke-dasharray="4 4" opacity=".7"/><text x="${W - pr}" y="${Y(0) - 4}" text-anchor="end" font-size="10" fill="var(--danger)">$0</text>` : '';
+  const grid = [max, (max + min) / 2, min].map(v => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${pl - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="10" fill="var(--faint)">${esc(money(v, 0))}</text>`).join('');
+  const li = fc.pts.indexOf(fc.low);
+  const dots = fc.pts.map((p, i) => p.ev.length ? `<circle cx="${X(i)}" cy="${Y(p.bal)}" r="3.5" fill="var(--surface)" stroke="${p.ev.some(e => e.startsWith('+')) ? 'var(--mint)' : 'var(--accent)'}" stroke-width="2"><title>${esc(fmtD(p.d))}: ${esc(money(p.bal))}\n${esc(p.ev.join('\n'))}</title></circle>` : '').join('');
+  const weeks = fc.pts.map((p, i) => i && i % 7 === 0 ? `<text x="${X(i)}" y="${h - 6}" text-anchor="middle" font-size="10" fill="var(--faint)">${esc(fmtD(p.d, { day: 'numeric', month: 'short' }))}</text>` : '').join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}">${grid}${zero}<path d="${line} L${X(fc.pts.length - 1)} ${Y(min)} L${X(0)} ${Y(min)}Z" fill="var(--lav)" opacity=".1"/><path d="${line}" fill="none" stroke="var(--lav)" stroke-width="2.5" stroke-linejoin="round"/>${dots}
+    <circle cx="${X(li)}" cy="${Y(fc.low.bal)}" r="6" fill="${fc.low.bal < 0 ? 'var(--danger)' : 'var(--gold)'}"><title>Lowest point: ${esc(money(fc.low.bal))} on ${esc(fmtD(fc.low.d))}</title></circle>${weeks}</svg>`;
+}
+
+/* ---------- help mode: a small "?" beside each section ---------- */
+const HELP = {
+  safe: 'Your balance, minus spending since you checked it, minus bills due before payday, minus money set aside and your cushion, shared across the days until payday.',
+  quick: 'Type an amount and a word, like "12 coffee", and press Enter. The word picks the category. Use the + keys to build an amount with one hand.',
+  three: 'Three tiny jobs that keep every number right. Each takes under a minute. Do them in any order.',
+  forecast: 'Your bank balance day by day for the next 45 days: paychecks go up, bills come down, and your usual daily spending is taken off. The gold dot is your lowest point.',
+  whatif: 'Thinking about a purchase? Drag the dial to see what it does to today\'s safe-to-spend and to your lowest point before any money moves.',
+  coming: 'Your next bills, soonest first. Tick one when it\'s paid and it moves to its next date.',
+  bills: 'Every bill, however often it comes round. Big bills that land every few months are spread into a small amount each payday.',
+  debt: 'Snowball pays the smallest balance first for quick wins. Avalanche pays the highest interest first to save the most. Freed-up payments roll onto the next debt.',
+  cal: 'Paydays, every bill on the day it falls, and what you spent each day. Tap a day for details.',
+  goals: 'Add money whenever you save. The ring fills up and the planner works out when you\'ll get there.',
+  env: 'Each envelope is a monthly cap for one kind of spending. Spending you log in that category fills it. Going over is fine: it just tells you.',
+  chal: 'Pick a challenge and tap a box each time you put that amount aside. Link it to a goal and every box adds to the goal too. The no-spend challenge fills itself from your spending log.',
+  income: 'Log each payment as it lands. Safe to spend goes up straight away, minus the tax % you set. Plan on your lowest month so a slow month never catches you out.',
+  month: 'Money in, bills and spending for the month. Type a planned amount next to each category; the bar fills as you spend.',
+};
+// everyday words that point to a category when typing "12 coffee" in quick spend
+const WORD_CAT = {
+  Groceries: ['grocer', 'food', 'supermarket', 'milk', 'bread', 'aldi', 'walmart', 'tesco', 'costco', 'shop'],
+  'Eating out': ['lunch', 'dinner', 'breakfast', 'pizza', 'burger', 'takeaway', 'takeout', 'restaurant', 'cafe', 'mcdonald', 'sushi'],
+  Transport: ['gas', 'fuel', 'petrol', 'uber', 'lyft', 'taxi', 'bus', 'train', 'parking', 'toll'],
+  Treats: ['coffee', 'latte', 'tea', 'snack', 'candy', 'chocolate', 'starbucks', 'icecream'],
+  Fun: ['movie', 'cinema', 'game', 'concert', 'netflix', 'book', 'bar', 'drinks'],
+  Shopping: ['amazon', 'clothes', 'shoes', 'target', 'gift'],
+  Health: ['pharmacy', 'doctor', 'medicine', 'dentist', 'vitamin', 'gym'],
+  Kids: ['school', 'toy', 'diaper', 'nappy', 'daycare'],
+};
+// one-tap spends on Today; editable in Settings
+const presets = () => state.presets || [{ label: 'Coffee', amount: 4, cat: 'Treats' }, { label: 'Lunch', amount: 12, cat: 'Eating out' }, { label: 'Bus', amount: 3, cat: 'Transport' }, { label: 'Groceries', amount: 50, cat: 'Groceries' }];
+const hq = k => state.settings.help === false ? '' : `<button class="hq" data-act="hq" data-k="${k}" title="What is this?">?</button>`;
+// three small jobs that keep the numbers right, with how long each takes
+function threeThings() {
+  const t = iso(d0()), next = state.bills.map(b => ({ b, d: nextDue(b) })).filter(x => x.d && daysBetween(d0(), x.d) <= 3).sort((a, b) => a.d - b.d)[0];
+  const items = [
+    next ? { done: false, text: `Mark ${next.b.name} paid`, time: '10 sec', act: `data-act="paid" data-id="${next.b.id}" data-d="${iso(next.d)}"` } : { done: true, text: 'No bills due in the next 3 days', time: '' },
+    { done: state.spends.some(x => x.date === t && x.ts), text: 'Log anything you spent today', time: '30 sec', act: 'data-act="focusQa"' },
+    { done: accts().some(a => a.balanceDate === t), text: 'Check your balance', time: '1 min', act: 'data-act="editBalance"' },
+  ];
+  return { items, done: items.filter(i => i.done).length };
+}
+
+function forecastBox(whatIf) {
+  const fc = forecast(whatIf), tight = fc.low.bal < 0, cush = state.settings.cushion || 0;
+  const msg = tight ? `⚠️ Heads up: you could dip to <b class="neg">${esc(money(fc.low.bal))}</b> around ${esc(fmtD(fc.low.d))}. Spend a little less this week or move money in before then.`
+    : fc.low.bal < cush ? `Careful stretch around ${esc(fmtD(fc.low.d))}: lowest point ${esc(money(fc.low.bal))}, under your cushion.`
+    : `You stay above water. Lowest point <b>${esc(money(fc.low.bal))}</b> on ${esc(fmtD(fc.low.d))}.`;
+  return `${forecastChart(fc)}<div class="legend" style="margin:6px 0 10px"><span><i style="background:var(--mint)"></i>Paycheck</span><span><i style="background:var(--accent)"></i>Bill</span><span><i style="background:var(--gold)"></i>Lowest point</span><span>Usual spending: ${esc(money(fc.pace, 0))}/day</span></div><div class="small" style="line-height:1.6">${msg}</div>`;
+}
+
+/* ---------- debt engine ---------- */
+function simulate(debts, extra, method, rollover = true) {
+  let ds = debts.filter(d => d.balance > 0 && d.min > 0).map(d => ({ ...d, bal: +d.balance, paidMonth: null }));
+  if (!ds.length) return { months: 0, interest: 0, series: [0], order: [], never: false };
+  const order = [...ds].sort((a, b) => method === 'avalanche' ? (b.apr - a.apr) || (a.bal - b.bal) : (a.bal - b.bal) || (b.apr - a.apr));
+  const budget = ds.reduce((s, d) => s + d.min, 0) + (rollover ? extra : 0);
+  let m = 0, interest = 0; const series = [ds.reduce((s, d) => s + d.bal, 0)];
+  while (m < 600 && ds.some(d => d.bal > 0.005)) {
+    m++;
+    for (const d of ds) if (d.bal > 0) { const i = Math.round(d.bal * d.apr / 1200 * 100) / 100; d.bal += i; interest += i; }
+    let pool = budget;
+    for (const d of ds) if (d.bal > 0) { const p = Math.min(d.min, d.bal); d.bal -= p; pool -= p; }
+    if (rollover) for (const o of order) { const d = ds.find(x => x.id === o.id); if (d.bal > 0 && pool > 0) { const p = Math.min(pool, d.bal); d.bal -= p; pool -= p; } }
+    for (const d of ds) if (d.bal <= 0.005 && !d.paidMonth) { d.bal = 0; d.paidMonth = m; }
+    series.push(ds.reduce((s, d) => s + d.bal, 0));
+  }
+  const never = ds.some(d => d.bal > 0.005);
+  return { months: never ? Infinity : m, interest, series, never, order: order.map(o => ds.find(x => x.id === o.id)) };
+}
+
+/* ---------- icons ---------- */
+const I = {
+  today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  spend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M7 15h4"/></svg>',
+  bills: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"/></svg>',
+  debt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 19V5M4 19h16M8 15l4-4 3 3 5-6"/></svg>',
+  goals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>',
+  month: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  check: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg>',
+};
+I.cal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><circle cx="8" cy="15" r="1.2" fill="currentColor"/><circle cx="12" cy="15" r="1.2" fill="currentColor"/><circle cx="16" cy="15" r="1.2" fill="currentColor"/></svg>';
+I.more = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg>';
+I.env = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 8l9 6 9-6"/></svg>';
+I.chal = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14.5 17.5l2 2 4-4"/></svg>';
+I.income = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M16.5 7.5c0-1.7-2-3-4.5-3s-4.5 1.3-4.5 3 1.6 2.6 4.5 3.2 4.5 1.6 4.5 3.3-2 3-4.5 3-4.5-1.3-4.5-3"/></svg>';
+const VIEWS = [['today', 'Today'], ['spend', 'Spend'], ['income', 'Income'], ['env', 'Envelopes'], ['chal', 'Challenges'], ['bills', 'Bills'], ['cal', 'Calendar'], ['debt', 'Debt'], ['goals', 'Goals'], ['month', 'Month'], ['settings', 'Settings']];
+// screens only some apps show: an app lists them in its own nav (Calm Money's default nav leaves them out)
+const SPECIAL = ['income', 'chal'];
+const navBase = () => ED.nav ? ED.nav.map(k => VIEWS.find(v => v[0] === k)).filter(Boolean) : VIEWS.filter(v => !SPECIAL.includes(v[0]));
+const CAT_EMOJI = { Groceries: '🛒', 'Eating out': '🍜', Transport: '🚗', Fun: '🎟️', Shopping: '🛍️', Health: '💊', Kids: '🧸', Treats: '☕', Pets: '🐾', Gifts: '🎁', Other: '✳️', Home: '🏠', Debt: '📉', Subscriptions: '📺', 'Phone & internet': '📶', Utilities: '💡', Insurance: '🛡️', Gas: '⛽', Household: '🧺', 'Personal care': '🧴', Coffee: '☕', Clothes: '👕', Travel: '✈️', Savings: '🐖', Business: '💼', Tax: '🧾' };
+const em = c => CAT_EMOJI[c] || '🏷️';
+
+/* ---------- charts ---------- */
+// value = the number in the middle; share = how full the arc is (0..1)
+function gauge(value, share) {
+  const pct = Math.max(0, Math.min(1, share || 0));
+  const R = 120, cx = 150, cy = 150, a0 = Math.PI * 0.85, a1 = Math.PI * 2.15;
+  const pt = a => [cx + R * Math.cos(a), cy + R * Math.sin(a)];
+  const arc = (s, e) => { const [x0, y0] = pt(s), [x1, y1] = pt(e); return `M${x0} ${y0} A${R} ${R} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x1} ${y1}`; };
+  const end = a0 + (a1 - a0) * pct;
+  const [kx, ky] = pt(end);
+  return `<svg class="gauge" viewBox="0 0 300 230" aria-hidden="true">
+    <defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="var(--mint)"/><stop offset=".55" stop-color="var(--lav)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4"/></filter></defs>
+    <path d="${arc(a0, a1)}" stroke="var(--line)" stroke-width="16" fill="none" stroke-linecap="round"/>
+    ${pct > 0.005 ? `<path d="${arc(a0, end)}" stroke="url(#gg)" stroke-width="16" fill="none" stroke-linecap="round" filter="url(#glow)" opacity=".55"/>
+    <path class="arc" style="--len:${(R * (end - a0)).toFixed(1)}" d="${arc(a0, end)}" stroke="url(#gg)" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <circle cx="${kx}" cy="${ky}" r="9" fill="var(--surface)" stroke="var(--text)" stroke-width="3"/>` : ''}
+    <text x="150" y="112" text-anchor="middle" fill="var(--muted)" font-size="11" letter-spacing="2" font-family="var(--sans)">SAFE TO SPEND TODAY</text>
+    <text x="150" y="160" text-anchor="middle" fill="var(--text)" font-size="46" font-weight="600" font-family="var(--serif)">${esc(money(Math.max(0, value)))}</text>
+  </svg>`;
+}
+function bars(values, labels, h = 150) {
+  const W = 560, pad = 24, max = Math.max(1, ...values), bw = (W - pad * 2) / values.length;
+  const g = values.map((v, i) => { const bh = (v / max) * (h - 40); const x = pad + i * bw + bw * .18, w = bw * .64;
+    return `<rect x="${x}" y="${h - 22 - bh}" width="${w}" height="${Math.max(bh, 2)}" rx="${Math.min(6, w / 2)}" fill="${i === values.length - 1 ? 'var(--accent)' : 'url(#bg)'}" opacity="${v ? 1 : .35}"><title>${esc(labels[i])}: ${esc(money(v))}</title></rect>
+      ${i % 2 === values.length % 2 || values.length < 8 ? `<text x="${x + w / 2}" y="${h - 6}" text-anchor="middle" font-size="10" fill="var(--faint)">${esc(labels[i])}</text>` : ''}`; }).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}"><defs><linearGradient id="bg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="var(--lav)" stop-opacity=".5"/><stop offset="1" stop-color="var(--lav)"/></linearGradient></defs>${g}</svg>`;
+}
+function lines(seriesList, colors, h = 220) {
+  const W = 640, pl = 48, pr = 12, pt = 12, pb = 26;
+  const len = Math.max(...seriesList.map(s => s.length)), max = Math.max(1, ...seriesList.flat());
+  const X = i => pl + (i / Math.max(1, len - 1)) * (W - pl - pr), Y = v => pt + (1 - v / max) * (h - pt - pb);
+  const grid = [0, .5, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${Y(max * f)}" y2="${Y(max * f)}" stroke="var(--line)" stroke-dasharray="3 4"/><text x="${pl - 8}" y="${Y(max * f) + 4}" text-anchor="end" font-size="10" fill="var(--faint)">${esc(money(max * f, 0))}</text>`).join('');
+  const years = []; for (let i = 12; i < len; i += 12) years.push(`<text x="${X(i)}" y="${h - 6}" text-anchor="middle" font-size="10" fill="var(--faint)">${i / 12}y</text>`);
+  const paths = seriesList.map((s, k) => { const d = s.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(' ');
+    return (k === 0 ? `<path d="${d} L${X(s.length - 1)} ${Y(0)} L${X(0)} ${Y(0)}Z" fill="${colors[k]}" opacity=".12"/>` : '') + `<path d="${d}" fill="none" stroke="${colors[k]}" stroke-width="${k === 0 ? 3 : 2}" ${k ? 'stroke-dasharray="6 5"' : ''} stroke-linejoin="round"/>`; }).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${h}">${grid}${paths}${years.join('')}</svg>`;
+}
+function donut(parts, size = 170) {
+  const tot = parts.reduce((s, p) => s + p.v, 0) || 1, r = 62, c = 2 * Math.PI * r; let off = 0;
+  const segs = parts.map(p => { const len = p.v / tot * c; const s = `<circle r="${r}" cx="85" cy="85" fill="none" stroke="${p.color}" stroke-width="22" stroke-dasharray="${len} ${c - len}" stroke-dashoffset="${-off}" transform="rotate(-90 85 85)"><title>${esc(p.label)}</title></circle>`; off += len; return s; }).join('');
+  return `<svg viewBox="0 0 170 170" width="${size}" height="${size}"><circle r="${r}" cx="85" cy="85" fill="none" stroke="var(--line)" stroke-width="22"/>${segs}</svg>`;
+}
+function ring(pct, color = 'var(--mint)') {
+  const r = 34, c = 2 * Math.PI * r, p = Math.max(0, Math.min(1, pct));
+  return `<svg class="ring" viewBox="0 0 84 84"><circle r="${r}" cx="42" cy="42" fill="none" stroke="var(--line)" stroke-width="8"/><circle r="${r}" cx="42" cy="42" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c * p} ${c}" transform="rotate(-90 42 42)"/><text x="42" y="47" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text)">${Math.round(p * 100)}%</text></svg>`;
+}
+const PALETTE = ['var(--mint)', 'var(--lav)', 'var(--accent)', 'var(--gold)', '#6fb7ff', '#ff8fc7', '#9be37a', '#c7a4ff', '#ffb36b', '#7fd6ff'];
+
+/* ---------- views ---------- */
+function vToday() {
+  const s = state.settings, sf = safe(), p = sf.p;
+  const hour = new Date().getHours(); const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const upcoming = state.bills.map(b => ({ b, d: nextDue(b) })).filter(x => x.d).sort((a, b) => a.d - b.d);
+  const first = upcoming[0];
+  const periodStart = prevPayday();
+  const spentPeriod = state.spends.filter(x => parse(x.date) >= periodStart).reduce((a, x) => a + x.amount, 0);
+  const days = [...Array(14)].map((_, i) => addDays(d0(), i - 13));
+  const perDay = days.map(d => state.spends.filter(x => x.date === iso(d)).reduce((a, x) => a + x.amount, 0));
+  const mood = sf.total < 0 ? "Short this time. Pay the must-pays first, then move money in or push a bill if you can." : sf.perDay <= 0 ? "Tight until payday. Essentials only, and that's okay." : sf.perDay < 15 ? 'A careful few days. You can do this.' : "You're good. You've got this.";
+  // arc = share of this pay period's spending money that is still left
+  const left = Math.max(0, sf.total), share = left + spentPeriod > 0 ? left / (left + spentPeriod) : 0;
+  const soonest = first && daysBetween(d0(), first.d);
+  const html = `
+  ${DEMO ? `<div class="banner"><span>✨ <b>Free demo</b>: every screen, no watermark. Log up to ${DEMO_LIMIT} spends (${Math.max(0, DEMO_LIMIT - state.spends.filter(x => x.ts).length)} left).</span><span class="row"><a class="btn sm" href="${SHOP_URL}" target="_blank" rel="noopener" style="text-decoration:none">Get the full planner</a></span></div>` : ''}
+  ${state.demo ? `<div class="banner"><span>👋 These are <b>example numbers</b> so you can look around safely. Nothing here is real.</span><span class="row"><button class="btn sm" data-act="startFresh">Start my own</button></span></div>` : ''}
+  ${(() => { const pk = monthKey(new Date(d0().getFullYear(), d0().getMonth() - 1, 1)); return !DEMO && d0().getDate() <= 7 && state.wrappedSeen !== pk && state.spends.some(x => x.date.startsWith(pk)) ? `<div class="banner"><span>🎉 Your <b>${esc(fmtD(new Date(d0().getFullYear(), d0().getMonth() - 1, 1), { month: 'long' }))} Wrapped</b> is ready: what you kept, your no-spend days and more.</span><button class="btn sm" data-act="wrapLast">See it</button></div>` : ''; })()}<div><h1 class="hello">${greet}${s.name ? ', ' + esc(s.name) : ''}.</h1><div class="sub">${fmtD(d0(), { weekday: 'long', day: 'numeric', month: 'long' })} · payday ${fmtD(p)} · ${sf.days} day${sf.days === 1 ? '' : 's'} to go</div></div>
+  <div class="chips hide-in-focus"><button class="chip" data-act="simple">${s.simple ? '✨ Everything' : '🌱 Simple'}</button><button class="chip" data-act="focus">🧘 Focus mode</button><button class="chip" data-act="helpToggle">${state.settings.help === false ? '❔ Help off' : '❓ Help on'}</button><button class="chip" data-act="theme">${['light', 'forest', 'sunset'].includes(s.theme) ? '🌙 Dark' : '☀️ Light'}</button></div></div>
+  <!--§one--><div class="one"><div class="dot">${I.check}</div><div class="grow">${first ? `<b>Right now, one thing: pay ${esc(first.b.name)} · ${esc(money(first.b.amount))}</b><span class="small muted">${soonest < 0 ? `Overdue: it was due ${fmtD(first.d)}` : 'Due ' + (soonest === 0 ? 'today' : soonest === 1 ? 'tomorrow' : fmtD(first.d))}. Tap done when it's paid and it drops off.</span>` : `<b>Nothing needs you right now.</b><span class="small muted">No bills waiting. Breathe.</span>`}</div>${first ? `<button class="btn mint sm" data-act="paid" data-id="${first.b.id}" data-d="${iso(first.d)}">Done</button>` : ''}</div>
+  <!--§hero--><div class="grid g-hero">
+    <div class="card hero">${gauge(sf.perDay, share)}
+      <div class="pace">${sf.total < 0 ? `<b class="neg">Short by ${esc(money(-sf.total))} before payday</b> · bills and money set aside come first` : `${esc(money(sf.total))} safe until payday · ${Math.round(share * 100)}% of this pay period's spending money left`}</div>
+      <div class="trio"><div class="tap" data-act="editBalance" title="Update balance"><small>In the bank ✎</small><b>${esc(money(sf.balance - sf.since + sf.got, 0))}</b></div><div><small>Bills due</small><b>${esc(money(sf.bills, 0))}</b></div><div><small>Set aside</small><b>${esc(money(sf.aside + sf.cushion + sf.hold, 0))}</b></div></div>
+      <div class="mood">${mood}</div>
+      <button class="how" data-act="explain" style="margin-top:10px">How is this worked out?</button> ${hq('safe')}
+      <div class="explain" id="explain" hidden>
+        <div><span>${multi() ? `Spending accounts (${sf.per.length})` : `Bank balance (${fmtD(parse(s.balanceDate))})`}</span><b>${esc(money(sf.balance))}</b></div>
+        <div><span>− Spent since then</span><b>${esc(money(sf.since))}</b></div>
+        <div><span>− Bills due before payday</span><b>${esc(money(sf.bills))}</b></div>
+        <div><span>− Money set aside</span><b>${esc(money(sf.aside))}</b></div>
+        <div><span>− Safety cushion</span><b>${esc(money(sf.cushion))}</b></div>
+        ${sf.got ? `<div><span>+ Income logged since then</span><b>${esc(money(sf.got))}</b></div>` : ''}
+        ${sf.extraIn - sf.got ? `<div><span>+ Other pay arriving before payday</span><b>${esc(money(sf.extraIn - sf.got))}</b></div>` : ''}
+        ${sf.tHold ? `<div><span>− Set aside for tax</span><b>${esc(money(sf.tHold))}</b></div>` : ''}
+        ${sf.billHold ? `<div><span>− Held back for big bills</span><b>${esc(money(sf.billHold))}</b></div>` : ''}
+        <div style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px"><span>= Safe until payday, ÷ ${sf.days} days</span><b>${esc(money(sf.total))}</b></div>
+      </div>
+    </div>
+    <div class="grid" style="gap:18px">
+      <div class="card"><h3><span>Quick spend ${hq('quick')}</span><span class="tiny faint">type "12 coffee" and press enter</span></h3>
+        <div class="row"><label class="f" style="flex:1"><input id="qa" class="bigin" placeholder="0.00 groceries" inputmode="text" autocomplete="off"></label><button class="btn" data-act="quickAdd">Add</button></div>
+        <div class="quick">${presets().map((p, i) => `<button class="chip" data-act="preset" data-v="${i}" title="Log ${esc(p.label)} straight away">+ ${esc(p.label)} ${esc(money(p.amount, 0))}</button>`).join('')}</div><div class="quick">${[1, 5, 10, 20].map(v => `<button class="chip" data-act="qaPlus" data-v="${v}">+${esc(money(v, 0))}</button>`).join('')}</div><div class="quick">${Object.keys(state.budgets).slice(0, 6).map(c => `<button class="chip" data-act="pickCat" data-c="${esc(c)}">${em(c)} ${esc(c)}</button>`).join('')}</div>
+      </div>
+      <div class="card"><h3>This pay period <span class="tiny faint">since ${fmtD(periodStart)}</span></h3>
+        <div class="grid g2" style="gap:12px">
+          <div class="stat"><span class="small muted">Money in</span><span class="big pos">${esc(money(moneyInSince(periodStart), 0))}</span></div>
+          <div class="stat"><span class="small muted">Spent so far</span><span class="big">${esc(money(spentPeriod, 0))}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--§three-->${(() => { const tt = threeThings(); return `<div class="card" style="margin-top:18px"><h3><span>✅ Three small things ${hq('three')}</span><span class="tiny faint">${tt.done} of 3 done</span></h3><div class="list">${tt.items.map(i => `<div class="item"><button class="check ${i.done ? 'on' : ''}" ${i.done ? 'disabled' : i.act}>${I.check}</button><div class="grow"><div class="t" style="${i.done ? 'text-decoration:line-through;color:var(--muted)' : ''}">${esc(i.text)}</div></div>${i.time ? `<span class="tag">${i.time}</span>` : ''}</div>`).join('')}</div></div>`; })()}
+  <!--§forecast--><div class="card hide-in-focus" style="margin-top:18px"><h3><span>📈 The next 45 days ${hq('forecast')}</span><span class="tiny faint">every bill and paycheck on the day it lands, plus your usual spending</span></h3>
+    <div id="fcBox">${forecastBox(0)}</div>
+    <div class="whatif"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px"><b>🎚️ What if I spend… ${hq('whatif')}</b><span class="big" id="wiVal" style="font-size:22px">${esc(money(0, 0))}</span></div>
+      <input id="wi" type="range" min="0" max="${Math.max(100, Math.ceil(Math.max(0, safe().balance) / 50) * 50)}" step="10" value="0" style="width:100%;accent-color:var(--accent)">
+      <div class="small muted" id="wiTxt">Drag to test a purchase before any money moves.</div></div>
+  </div>
+  <!--§accounts-->${multi() ? `<div class="card" style="margin-top:18px"><h3>Each account <button class="btn ghost sm" data-act="editBalance">Update balances</button></h3><div class="list">
+    ${sf.per.map(x => `<div class="item"><div class="ico">🏦</div><div class="grow"><div class="t">${esc(x.a.name)}</div><div class="s">${esc(money(x.a.balance - x.since + x.got))} now${x.bills ? ` · ${esc(money(x.bills))} of bills before payday` : ' · no bills before payday'}${x.extraIn ? ` · +${esc(money(x.extraIn))} pay coming in` : ''}</div></div><div style="text-align:right"><div class="amt ${x.left < 0 ? 'neg' : 'pos'}">${esc(money(x.left))}</div><div class="s ${x.left < 0 ? 'neg' : 'muted'}">${x.left < 0 ? 'short: move money in before the bill' : 'left after bills'}</div></div></div>`).join('')}
+    ${cardAccts().map(a => `<div class="item"><div class="ico">💳</div><div class="grow"><div class="t">${esc(a.name)}</div><div class="s">Credit card: charges don't come out of the bank today</div></div><div style="text-align:right"><div class="amt neg">${esc(money(a.balance + cardCharges(a)))}</div><div class="s muted">owed</div></div></div>`).join('')}
+    ${sf.savings.map(a => `<div class="item"><div class="ico">🐖</div><div class="grow"><div class="t">${esc(a.name)}</div><div class="s">Savings, not counted as spendable</div></div><span class="amt">${esc(money(a.balance))}</span></div>`).join('')}
+    </div><p class="tiny faint" style="margin:8px 0 0">Money set aside, your cushion and big-bill holdbacks come off the total above, not any one account.</p></div>` : ''}
+  <!--§dump--><div class="card" style="margin-top:18px"><h3>🧠 Brain dump <span class="tiny faint">no amount, no category, no date. It never touches your numbers.</span></h3>
+    <div class="row"><label class="f" style="flex:1"><input id="bd" placeholder="e.g. call the bank about the late fee" autocomplete="off"></label><button class="btn ghost" data-act="addDump">Add</button></div>
+    ${(state.dump || []).length ? `<div class="list" style="margin-top:6px">${state.dump.slice().reverse().map(x => `<div class="item"><button class="check" data-act="delDump" data-id="${x.id}" title="Done">${I.check}</button><div class="grow"><div class="t" style="white-space:normal">${esc(x.text)}</div></div></div>`).join('')}</div>` : ''}
+  </div>
+  <!--§lower--><div class="grid g2 hide-in-focus" style="margin-top:18px">
+    <div class="card"><h3><span>Coming up ${hq('coming')}</span><button class="btn ghost sm" data-go="bills">All bills</button></h3>
+      <div class="list">${upcoming.slice(0, 6).map(({ b, d }) => { const dd = daysBetween(d0(), d); return `<div class="item"><div class="ico">${em(b.cat)}</div><div class="grow"><div class="t">${esc(b.name)}</div><div class="s">${dd < 0 ? `<span class="neg">Overdue · was due ${fmtD(d)}</span>` : dd === 0 ? 'Today' : dd === 1 ? 'Tomorrow' : fmtD(d)}${d < p ? ' · before payday' : ''}</div></div><span class="amt">${esc(money(b.amount))}</span><button class="check" title="Mark paid" data-act="paid" data-id="${b.id}" data-d="${iso(d)}">${I.check}</button></div>`; }).join('') || '<div class="empty">No bills yet. Add them in Bills.</div>'}</div>
+    </div>
+    <div class="card"><h3>Last 14 days <span class="tiny faint">${esc(money(perDay.reduce((a, b) => a + b, 0)))} spent</span></h3>
+      ${bars(perDay, days.map(d => d.getDate() + ''))}
+      <div class="list" style="margin-top:6px">${state.spends.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3).map(x => `<div class="item"><div class="ico">${em(x.cat)}</div><div class="grow"><div class="t">${esc(x.note || x.cat)}</div><div class="s">${fmtD(parse(x.date))} · ${esc(x.cat)}</div></div><span class="amt">${esc(money(x.amount))}</span></div>`).join('')}</div>
+    </div>
+  </div>`;
+  if (!ED.todayOrder) return html;
+  // an edition can put the Today sections in its own order (banners always stay on top)
+  const parts = html.split(/<!--§(\w+)-->/), head = parts[0], sec = {};
+  for (let i = 1; i < parts.length; i += 2) sec[parts[i]] = parts[i + 1];
+  return head + ED.todayOrder.map(k => sec[k] || '').join('') + Object.keys(sec).filter(k => !ED.todayOrder.includes(k) && !(ED.todayHide || []).includes(k)).map(k => sec[k]).join('');
+}
+function shownMore() {
+  const tabs = state.settings.simple ? ['today', 'spend', 'bills', 'cal', 'settings'] : (ED.tabs || ['today', 'spend', 'bills', 'cal', 'debt']);
+  const base = navBase();
+  return base.filter(([k]) => !tabs.includes(k) && !(state.settings.simple && ['debt', 'goals', 'month'].includes(k)));
+}
+
+function vSpend() {
+  const cats = Object.keys(state.budgets);
+  const list = state.spends.slice().sort((a, b) => b.date.localeCompare(a.date));
+  const groups = {}; list.forEach(x => (groups[x.date] ||= []).push(x));
+  return `<div class="top"><div><h1 class="hello">Spending</h1><div class="sub">Log it in seconds. Mistyped? Fix or delete it right here.</div></div></div>
+  <div class="card"><h3>Add a spend</h3>
+    <div class="form">
+      <label class="f" style="grid-column:span 1">Amount<input id="sAmt" class="bigin" inputmode="decimal" placeholder="0.00"></label>
+      <label class="f">Category<select id="sCat">${cats.map(c => `<option>${esc(c)}</option>`).join('')}</select></label>
+      <label class="f">Date<input id="sDate" type="date" value="${iso(d0())}"></label>
+      ${acctSelect('sAcct', null, 'Paid from')}<label class="f">Note (optional)<input id="sNote" placeholder="e.g. Lunch with Sam"></label>
+      <button class="btn" data-act="addSpend" style="height:46px">Add spend</button>
+    </div>
+    <div class="quick">${[5, 10, 20, 50, 100].map(v => `<button class="chip" data-act="amt" data-v="${v}">${esc(money(v, 0))}</button>`).join('')}</div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>History <span class="tiny faint">${list.length} spends</span></h3>
+    ${Object.entries(groups).slice(0, 40).map(([d, xs]) => `<div class="small muted" style="margin:12px 0 2px">${fmtD(parse(d), { weekday: 'long', day: 'numeric', month: 'long' })} · ${esc(money(xs.reduce((a, x) => a + x.amount, 0)))}</div>
+      <div class="list">${xs.map(x => `<div class="item"><div class="ico">${em(x.cat)}</div><div class="grow"><div class="t">${esc(x.note || x.cat)}</div><div class="s">${esc(x.cat)}</div></div><span class="amt">${esc(money(x.amount))}</span><button class="btn ghost sm" data-act="editSpend" data-id="${x.id}">Edit</button><button class="x" data-act="delSpend" data-id="${x.id}" title="Delete">×</button></div>`).join('')}</div>`).join('') || '<div class="empty">Nothing logged yet.</div>'}
+  </div>`;
+}
+
+function billForm(b = {}) {
+  const f = b.freq || 'monthly';
+  return `<h2>${b.id ? 'Edit bill' : 'Add a bill'}</h2><p class="small muted">Pick how often it really comes round. The planner does the maths.</p>
+  <div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f">Name<input id="bName" value="${esc(b.name || '')}" placeholder="e.g. Rent"></label>
+    <label class="f">Amount<input id="bAmt" inputmode="decimal" value="${b.amount ?? ''}" placeholder="0.00"></label>
+    <label class="f">How often<select id="bFreq">${Object.entries(FREQ_TXT).map(([k, v]) => `<option value="${k}" ${k === f ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label class="f">Category<select id="bCat">${['Home', 'Utilities', 'Phone & internet', 'Insurance', 'Subscriptions', 'Debt', 'Kids', 'Transport', 'Health', 'Other'].map(c => `<option ${c === b.cat ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    ${acctSelect('bAcct', b.account, 'Paid from')}<label class="f" data-show="monthly twice">Day of month<input id="bD1" type="number" min="1" max="31" value="${b.day1 ?? 1}"></label>
+    <label class="f" data-show="twice">Second day<input id="bD2" type="number" min="1" max="31" value="${b.day2 ?? 15}"></label>
+    <label class="f" data-show="weekly biweekly months once">Next due date<input id="bAnchor" type="date" value="${b.anchor || iso(d0())}"></label>
+    <label class="f" data-show="months">Months apart<input id="bEvery" type="number" min="2" max="12" value="${b.every ?? 6}"></label>
+    <label class="f" data-show="months" style="grid-column:1/-1;flex-direction:row;align-items:center;gap:10px"><input id="bSmooth" type="checkbox" ${b.smooth !== false ? 'checked' : ''} style="width:18px;height:18px"> Put a bit aside each payday so it never lands as a lump</label>
+  </div>
+  <div class="row" style="justify-content:flex-end;margin-top:18px">${b.id ? `<button class="btn danger sm" data-act="delBill" data-id="${b.id}">Delete</button>` : ''}<span style="flex:1"></span><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveBill" data-id="${b.id || ''}">Save bill</button></div>`;
+}
+function vBills() {
+  const p = mainPayday(), bb = billsBeforePayday();
+  const rows = state.bills.map(b => ({ b, d: nextDue(b) })).sort((a, b) => (a.d || Infinity) - (b.d || Infinity));
+  const monthly = state.bills.reduce((s, b) => s + billMonthly(b), 0);
+  return `<div class="top"><div><h1 class="hello">Bills & must-pays ${hq('bills')}</h1><div class="sub">Soonest first. Tick them off as you pay and they move to the next date by themselves.</div></div><button class="btn" data-act="newBill">+ Add bill</button></div>
+  <div class="grid g3">
+    <div class="card"><h3>Still to go out</h3><div class="big acc">${esc(money(bb.total))}</div><div class="small muted">before payday on ${fmtD(p)}</div>${multi() ? spendAccts().map(a => `<div class="row small" style="justify-content:space-between;margin-top:6px"><span class="muted">${esc(a.name)}</span><b>${esc(money(billsBeforePayday(a.id).total))}</b></div>`).join('') : ''}</div>
+    <div class="card"><h3>Bills per month</h3><div class="big">${esc(money(monthly))}</div><div class="small muted">big irregular bills spread out</div></div>
+    <div class="card"><h3>Bills</h3><div class="big">${state.bills.length}</div><div class="small muted">${bb.rows.length} due before payday</div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>All bills</h3><div class="list">
+    ${rows.map(({ b, d }) => { const dd = d ? daysBetween(d0(), d) : null; return `<div class="item"><div class="ico">${em(b.cat)}</div><div class="grow"><div class="t">${esc(b.name)}</div><div class="s">${FREQ_TXT[b.freq]}${b.freq === 'months' ? ` (every ${b.every})` : ''}${multi() ? ` · ${esc(acctName(acctOf(b)))}` : ''} · ${d ? (dd < 0 ? `<span class="neg">overdue since ${fmtD(d)}</span>` : dd === 0 ? 'due today' : dd === 1 ? 'due tomorrow' : 'next ' + fmtD(d)) : 'no upcoming date'}${b.freq === 'months' && b.smooth ? ` · ${esc(money(billMonthly(b)))}/mo set aside` : ''}</div></div>
+      ${d && d < p ? '<span class="tag warn">before payday</span>' : ''}<span class="amt">${esc(money(b.amount))}</span>
+      <button class="btn ghost sm" data-act="editBill" data-id="${b.id}">Edit</button>${d ? `<button class="check" title="Mark paid" data-act="paid" data-id="${b.id}" data-d="${iso(d)}">${I.check}</button>` : ''}</div>`; }).join('') || '<div class="empty">Add your first bill: rent, phone, streaming, anything that comes round.</div>'}
+  </div></div>`;
+}
+
+function vDebt() {
+  const d = state.debts, plan = simulate(d, +state.debtExtra || 0, state.debtMethod), mins = simulate(d, 0, state.debtMethod, false);
+  const other = simulate(d, +state.debtExtra || 0, state.debtMethod === 'snowball' ? 'avalanche' : 'snowball');
+  const total = d.reduce((s, x) => s + +x.balance, 0);
+  const start = new Date(d0().getFullYear(), d0().getMonth() + 1, 1);
+  const when = m => isFinite(m) ? fmtD(addMonths(start, m - 1, 1), { month: 'long', year: 'numeric' }) : 'never';
+  const savedI = mins.never ? null : Math.max(0, mins.interest - plan.interest), savedM = mins.never ? null : Math.max(0, mins.months - plan.months);
+  const budget = d.reduce((s, x) => s + +x.min, 0) + (+state.debtExtra || 0);
+  return `<div class="top"><div><h1 class="hello">Debt payoff plan ${hq('debt')}</h1><div class="sub">Every freed-up payment rolls onto the next debt automatically.</div></div><button class="btn" data-act="newDebt">+ Add debt</button></div>
+  <div class="grid g3">
+    <div class="card"><h3>Debt-free</h3><div class="big ${plan.never ? 'neg' : 'pos'}">${d.length ? (plan.never ? 'Not yet' : esc(when(plan.months))) : '—'}</div><div class="small muted">${d.length ? (plan.never ? 'Payments are less than the interest. Add a little extra.' : `${plan.months} months · ${esc(money(budget, 0))}/month`) : 'Add a debt to see your date'}</div></div>
+    <div class="card"><h3>You'll save</h3><div class="big acc">${savedI == null ? (d.length ? 'Everything' : '—') : esc(money(savedI, 0))}</div><div class="small muted">${savedI == null ? (d.length ? 'Minimums alone would never finish.' : '') : `and ${savedM} months vs paying only minimums`}</div></div>
+    <div class="card"><h3>Total owed</h3><div class="big">${esc(money(total, 0))}</div><div class="small muted">${d.length} debts · ${esc(money(plan.never ? 0 : plan.interest, 0))} interest on this plan</div></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:12px">
+      <div class="seg"><button class="${state.debtMethod === 'snowball' ? 'on' : ''}" data-act="method" data-v="snowball">❄️ Snowball · smallest first</button><button class="${state.debtMethod === 'avalanche' ? 'on' : ''}" data-act="method" data-v="avalanche">🏔️ Avalanche · highest rate first</button></div>
+      <label class="f" style="flex-direction:row;align-items:center;gap:10px">Extra each month<input id="dExtra" inputmode="decimal" value="${state.debtExtra}" style="width:110px"></label>
+    </div>
+    <div class="small muted" style="margin-bottom:10px">${d.length && !other.never && !plan.never ? (other.interest < plan.interest - 1 ? `Tip: ${state.debtMethod === 'snowball' ? 'Avalanche' : 'Snowball'} would save another ${esc(money(plan.interest - other.interest, 0))} in interest.` : `This is the cheapest order for you. Nice.`) : ''}</div>
+    ${d.length ? lines([plan.series, mins.never ? mins.series.slice(0, Math.max(plan.series.length * 2, 24)) : mins.series], ['var(--accent)', 'var(--faint)']) : ''}
+    ${d.length ? `<div class="legend" style="margin-top:6px"><span><i style="background:var(--accent)"></i>Your plan</span><span><i style="background:var(--faint)"></i>Minimums only</span></div>` : ''}
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Payoff order</h3><div class="list">
+    ${plan.order.map((x, i) => `<div class="item"><div class="ico" style="font-weight:700">${i + 1}</div><div class="grow"><div class="t">${esc(x.name)}</div><div class="s">${esc(money(x.balance))} at ${(+x.apr).toFixed(2)}% · min ${esc(money(x.min))}${x.start > x.balance ? ` · <span class="pos">${esc(money(x.start - x.balance, 0))} paid off so far</span>` : ''}</div>
+      <div class="bar" style="margin-top:8px"><i style="width:${plan.never || !x.paidMonth ? 0 : Math.max(4, x.paidMonth / plan.months * 100)}%"></i></div></div>
+      <div style="text-align:right"><div class="amt">${x.paidMonth ? esc(when(x.paidMonth)) : '—'}</div><div class="s muted">${x.paidMonth ? x.paidMonth + ' months' : ''}</div></div>
+      <button class="btn mint sm" data-act="payDebt" data-id="${x.id}">Pay</button><button class="btn ghost sm" data-act="editDebt" data-id="${x.id}">Edit</button></div>`).join('')}
+    ${d.filter(x => +x.balance <= 0).map(x => `<div class="item"><div class="ico">🎉</div><div class="grow"><div class="t">${esc(x.name)}</div><div class="s pos">Paid off${x.start ? ` · ${esc(money(x.start, 0))} cleared` : ''}</div></div><button class="btn ghost sm" data-act="payDebt" data-id="${x.id}">History</button><button class="btn ghost sm" data-act="editDebt" data-id="${x.id}">Edit</button></div>`).join('')}
+    ${!d.length ? '<div class="empty">Add each card, loan or bill you owe. Balance, interest rate and minimum payment is all it needs.</div>' : ''}
+  </div></div>`;
+}
+function incomeForm(i = {}) {
+  const f = i.freq || 'monthly';
+  return `<h2>${i.id ? 'Edit income' : 'Add another income'}</h2><p class="small muted">A second job, your partner's pay, benefits, child support... anything that arrives on its own schedule.</p>
+  <div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f">Name<input id="iName" value="${esc(i.name || '')}" placeholder="e.g. Partner's pay"></label>
+    <label class="f">Amount each time<input id="iAmt" inputmode="decimal" value="${i.amount ?? ''}" placeholder="e.g. 850"></label>
+    <label class="f" style="grid-column:1/-1">How often<select id="iFreq">${[['weekly', 'Every week'], ['biweekly', 'Every 2 weeks'], ['twice', 'Twice a month'], ['monthly', 'Once a month']].map(([k, v]) => `<option value="${k}" ${k === f ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label class="f" data-ishow="weekly biweekly">A recent payday<input id="iAnchor" type="date" value="${i.anchor || iso(d0())}"></label>
+    <label class="f" data-ishow="monthly twice">Day of month<input id="iD1" type="number" min="1" max="31" value="${i.day1 ?? 1}"></label>
+    <label class="f" data-ishow="twice">Second day<input id="iD2" type="number" min="1" max="31" value="${i.day2 ?? 15}"></label>
+    ${acctSelect('iAcct', i.account, 'Paid into')}<label class="f">Auto-moved to savings (%)<input id="iSplit" type="number" min="0" max="100" value="${i.split ?? 0}"></label>
+    <label class="f" style="flex-direction:row;align-items:center;gap:10px;grid-column:1/-1"><input id="iEarly" type="checkbox" ${i.early ? 'checked' : ''} style="width:18px;height:18px"> Paid on the Friday before if it lands on a weekend</label>
+  </div><div class="row" style="justify-content:flex-end;margin-top:18px">${i.id ? `<button class="btn danger sm" data-act="delIncome" data-id="${i.id}">Delete</button>` : ''}<span style="flex:1"></span><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveIncome" data-id="${i.id || ''}">Save income</button></div>`;
+}
+function showIncomeFields() { const f = $('#iFreq'); if (!f) return; document.querySelectorAll('[data-ishow]').forEach(el => el.style.display = el.dataset.ishow.split(' ').includes(f.value) ? '' : 'none'); }
+function acctForm(a = {}) {
+  return `<h2>${a.id ? 'Edit account' : 'Add an account'}</h2>
+  <div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f">Name<input id="aName" value="${esc(a.name || '')}" placeholder="e.g. Joint account"></label>
+    <label class="f">Type<select id="aType"><option value="spending" ${a.type !== 'savings' ? 'selected' : ''}>Spending (bills and everyday money)</option><option value="savings" ${a.type === 'savings' ? 'selected' : ''}>Savings (never counted as spendable)</option><option value="credit" ${a.type === 'credit' ? 'selected' : ''}>Credit card (bills and spends charged to it)</option></select></label>
+    <label class="f" style="grid-column:1/-1">Balance right now (for a credit card: what you owe)<input id="aBal" inputmode="decimal" value="${a.balance ?? ''}" placeholder="e.g. 640"></label>
+  </div><div class="row" style="justify-content:flex-end;margin-top:18px">${a.id && state.accounts.length > 1 ? `<button class="btn danger sm" data-act="delAcct" data-id="${a.id}">Delete</button>` : ''}<span style="flex:1"></span><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveAcct" data-id="${a.id || ''}">Save account</button></div>`;
+}
+function paymentForm(x) {
+  const hist = (x.payments || []).slice().reverse();
+  return `<h2>Record a payment · ${esc(x.name)}</h2><p class="small muted">Paid extra, or made your usual payment? Log it and the balance comes down.</p>
+  <div class="form" style="grid-template-columns:1fr 1fr"><label class="f">Amount paid<input id="pA" class="bigin" inputmode="decimal" placeholder="0.00"></label><label class="f">Date<input id="pD" type="date" value="${iso(d0())}"></label></div>
+  <p class="small muted">Balance now: <b>${esc(money(x.balance))}</b>${x.start ? ` · started at ${esc(money(x.start))}` : ''}</p>
+  ${hist.length ? `<div class="list" style="max-height:180px;overflow:auto">${hist.map(p => `<div class="item"><div class="grow"><div class="t">${esc(money(p.amount))}</div><div class="s">${fmtD(parse(p.date), { day: 'numeric', month: 'short', year: 'numeric' })}</div></div></div>`).join('')}</div>` : ''}
+  <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn mint" data-act="savePayment" data-id="${x.id}">Record payment</button></div>`;
+}
+function debtForm(x = {}) {
+  return `<h2>${x.id ? 'Edit debt' : 'Add a debt'}</h2><div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f" style="grid-column:1/-1">Name<input id="xName" value="${esc(x.name || '')}" placeholder="e.g. Credit card"></label>
+    <label class="f">Balance<input id="xBal" inputmode="decimal" value="${x.balance ?? ''}"></label>
+    <label class="f">Interest rate (APR %)<input id="xApr" inputmode="decimal" value="${x.apr ?? ''}"></label>
+    <label class="f">Minimum payment<input id="xMin" inputmode="decimal" value="${x.min ?? ''}"></label>
+  </div><div class="row" style="justify-content:flex-end;margin-top:18px">${x.id ? `<button class="btn danger sm" data-act="delDebt" data-id="${x.id}">Delete</button>` : ''}<span style="flex:1"></span><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveDebt" data-id="${x.id || ''}">Save</button></div>`;
+}
+
+function vGoals() {
+  const g = state.goals;
+  return `<div class="top"><div><h1 class="hello">Savings goals ${hq('goals')}</h1><div class="sub">Watch them fill up. Every little bit counts.</div></div><button class="btn" data-act="newGoal">+ Add goal</button></div>
+  <div class="grid g3">${g.map(x => { const pct = x.target ? x.saved / x.target : 0; const left = Math.max(0, x.target - x.saved); const mo = x.monthly > 0 ? Math.ceil(left / x.monthly) : null;
+    return `<div class="card"><div class="row">${ring(pct, pct >= 1 ? 'var(--mint)' : 'var(--lav)')}<div class="grow" style="flex:1"><div style="font-size:22px">${esc(x.emoji || '🎯')}</div><h2>${esc(x.name)}</h2><div class="small muted">${esc(money(x.saved, 0))} of ${esc(money(x.target, 0))}</div></div></div>
+    <div class="small muted" style="margin:14px 0">${pct >= 1 ? '🎉 Goal reached!' : mo ? `About ${mo} month${mo > 1 ? 's' : ''} to go · ${fmtD(addMonths(d0(), mo, 1), { month: 'long', year: 'numeric' })}` : 'Add a monthly amount to see a date'}</div>
+    ${(() => { const n = goalNeed(x); return n && pct < 1 ? `<div class="small ${n.behind ? 'neg' : 'pos'}" style="margin:-6px 0 12px">${n.behind ? `⚠️ Behind: needs ${esc(money(n.perMonth, 0))}/month to be ready by ${esc(fmtD(n.by, { month: 'short', year: 'numeric' }))}` : `✓ On track for ${esc(fmtD(n.by, { month: 'short', year: 'numeric' }))}`}</div>` : ''; })()}
+    ${x.reserve ? `<div class="tag ok" style="display:inline-block;margin-bottom:12px">🔒 kept out of safe to spend</div>` : ''}
+    <div class="row"><button class="btn mint sm" data-act="addToGoal" data-id="${x.id}">+ Add money</button><button class="btn ghost sm" data-act="editGoal" data-id="${x.id}">Edit</button></div></div>`; }).join('') || '<div class="card empty">Emergency fund, a holiday, a new laptop... add your first goal.</div>'}</div>
+  <div class="card" style="margin-top:18px"><h3>🏆 Milestones <span class="tiny faint">wins that quietly add up. No streaks, nothing that can be broken.</span></h3>
+    <div class="list">${milestones().map(m => `<div class="item"><div class="ico">${m[0]}</div><div class="grow"><div class="t">${esc(m[1])}</div><div class="s">${esc(m[2])}</div></div></div>`).join('') || '<div class="empty">Your first win is close. Log a few spends or tick off a bill.</div>'}</div></div>`;
+}
+function milestones() {
+  const out = [], billsM = state.bills.reduce((s, b) => s + billMonthly(b), 0), inc = payPerMonth();
+  const paidDown = state.debts.reduce((s, d) => s + Math.max(0, (+d.start || 0) - (+d.balance || 0)), 0);
+  if (paidDown > 0) out.push(['📉', `${money(paidDown, 0)} of debt paid down`, 'Every payment counts.']);
+  state.debts.filter(d => +d.balance <= 0 && d.start).forEach(d => out.push(['🎉', `${d.name} paid off`, `${money(d.start, 0)} cleared for good.`]));
+  state.goals.filter(g => g.target && g.saved >= g.target).forEach(g => out.push([g.emoji || '🎯', `${g.name}: goal reached`, `${money(g.target, 0)} saved.`]));
+  for (let k = 1; k <= 6; k++) {
+    const m = new Date(d0().getFullYear(), d0().getMonth() - k, 1), key = monthKey(m);
+    const sp = state.spends.filter(x => x.date.startsWith(key)).reduce((a, x) => a + x.amount, 0);
+    if (sp && inc - billsM - sp > 0) { out.push(['🌤️', `${fmtD(m, { month: 'long' })} ended in the black`, `You kept about ${money(inc - billsM - sp, 0)}.`]); break; }
+  }
+  const n = state.spends.length; const step = [100, 50, 10].find(x => n >= x);
+  if (step) out.push(['✍️', `${step}+ spends logged`, 'Knowing where it goes is half the battle.']);
+  const ticked = (state.paidLog || []).length; if (ticked >= 5) out.push(['✅', `${ticked} bills ticked off on time`, 'Nothing slipped through.']);
+  return out;
+}
+// a goal with a "needed by" date: what it needs per month from now, and whether the planned amount keeps up
+function goalNeed(g) {
+  const by = parse(g.by); if (!by || !g.target) return null;
+  const months = Math.max(1, (by.getFullYear() - d0().getFullYear()) * 12 + by.getMonth() - d0().getMonth());
+  const perMonth = Math.max(0, g.target - g.saved) / months;
+  return { by, perMonth, behind: (+g.monthly || 0) + 0.005 < perMonth };
+}
+// sinking funds: the planned monthly amount of reserved goals is held back each pay period
+function goalHold() {
+  const per = { weekly: 12 / 52, biweekly: 12 / 26, twice: .5, monthly: 1 }[state.settings.payFreq] || 1;
+  return state.goals.filter(g => g.reserve && g.saved < g.target).reduce((s, g) => s + Math.max(+g.monthly || 0, goalNeed(g)?.perMonth || 0) * per, 0);
+}
+function goalForm(x = {}) {
+  return `<h2>${x.id ? 'Edit goal' : 'New goal'}</h2><div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f">Name<input id="gName" value="${esc(x.name || '')}" placeholder="e.g. Emergency fund"></label>
+    <label class="f">Emoji<input id="gEmoji" value="${esc(x.emoji || '🎯')}" maxlength="4"></label>
+    <label class="f">Target<input id="gT" inputmode="decimal" value="${x.target ?? ''}"></label>
+    <label class="f">Saved so far<input id="gS" inputmode="decimal" value="${x.saved ?? 0}"></label>
+    <label class="f">Adding each month<input id="gM" inputmode="decimal" value="${x.monthly ?? ''}"></label>
+    <label class="f">Needed by (optional)<input id="gBy" type="date" value="${x.by || ''}"></label>
+    <label class="f" style="grid-column:1/-1;flex-direction:row;align-items:center;gap:10px"><input id="gRes" type="checkbox" ${x.reserve ? 'checked' : ''} style="width:18px;height:18px"> Keep this month's amount out of safe to spend (a sinking fund)</label>
+  </div><div class="row" style="justify-content:flex-end;margin-top:18px">${x.id ? `<button class="btn danger sm" data-act="delGoal" data-id="${x.id}">Delete</button>` : ''}<span style="flex:1"></span><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveGoal" data-id="${x.id || ''}">Save</button></div>`;
+}
+
+let monthOffset = 0;
+/* ---------- calendar ---------- */
+let calOffset = 0, calSel = null;
+function paydaysBetween(from, to) {
+  const all = incomes().flatMap(i => payDates(i, from, to)).map(iso);
+  return [...new Set(all)].sort().map(parse);
+}
+function dayInfo(d) {
+  const key = iso(d);
+  const bills = state.bills.flatMap(b => occurrences(b, d, addDays(d, 1)).map(x => ({ b, paid: !!b.paidThrough && x <= parse(b.paidThrough) })));
+  const spends = state.spends.filter(x => x.date === key);
+  return { bills, spends, spent: spends.reduce((a, x) => a + x.amount, 0) };
+}
+function vCal() {
+  const base = new Date(d0().getFullYear(), d0().getMonth() + calOffset, 1), next = new Date(base.getFullYear(), base.getMonth() + 1, 1);
+  const pays = paydaysBetween(base, next).map(iso), today = iso(d0());
+  const lead = (base.getDay() + 6) % 7, total = dim(base.getFullYear(), base.getMonth());
+  let billsTotal = 0, spentTotal = 0;
+  const cells = [];
+  for (let i = 0; i < lead; i++) cells.push('<div class="cd blank"></div>');
+  for (let n = 1; n <= total; n++) {
+    const d = new Date(base.getFullYear(), base.getMonth(), n), k = iso(d), info = dayInfo(d), isPay = pays.includes(k);
+    billsTotal += info.bills.reduce((a, x) => a + x.b.amount, 0); spentTotal += info.spent;
+    cells.push(`<button class="cd ${k === today ? 'today' : ''} ${k === calSel ? 'sel' : ''} ${d < d0() ? 'past' : ''}" data-act="calDay" data-d="${k}">
+      <span class="n">${n}</span>${isPay ? '<span class="pay">💵<em> Payday</em></span>' : ''}
+      ${info.bills.slice(0, 2).map(x => `<span class="bl ${x.paid ? 'paid' : d < d0() ? 'gone' : ''}"><i></i><em>${esc(x.b.name)}</em></span>`).join('')}${info.bills.length > 2 ? `<span class="more">+${info.bills.length - 2}</span>` : ''}
+      ${(state.dayNotes || {})[k] ? '<span class="more">📝 note</span>' : ''}${info.spent ? `<span class="sp">${esc(money(info.spent, 0))}</span>` : ''}</button>`);
+  }
+  const sel = calSel && calSel.startsWith(monthKey(base)) ? parse(calSel) : null, si = sel ? dayInfo(sel) : null;
+  return `<div class="top"><div><h1 class="hello">${fmtD(base, { month: 'long', year: 'numeric' })} ${hq('cal')}</h1><div class="sub">Paydays, bills and spending on one calendar. Tap a day to see it.</div></div>
+    <div class="chips"><button class="chip" data-act="calPrev">← Previous</button><button class="chip" data-act="calToday">Today</button><button class="chip" data-act="calNext">Next →</button></div></div>
+  <div class="grid g3">
+    <div class="card"><h3>Paydays</h3><div class="big pos">${pays.length}</div><div class="small muted">${pays.map(p => fmtD(parse(p), { day: 'numeric', month: 'short' })).join(' · ') || 'none this month'}</div></div>
+    <div class="card"><h3>Bills this month</h3><div class="big acc">${esc(money(billsTotal, 0))}</div><div class="small muted">every time a bill really falls</div></div>
+    <div class="card"><h3>Spent</h3><div class="big">${esc(money(spentTotal, 0))}</div><div class="small muted">from your spending log</div></div>
+  </div>
+  <div class="card" style="margin-top:18px">
+    <div class="calgrid">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(w => `<div class="wd">${w}</div>`).join('')}${cells.join('')}</div>
+    <div class="legend" style="margin-top:12px"><span>💵 Payday</span><span><i style="background:var(--accent)"></i>Bill due</span><span><i style="background:var(--mint)"></i>Bill paid</span><span><i style="background:var(--lav)"></i>Spending</span></div>
+  </div>
+  ${sel ? `<div class="card" style="margin-top:18px"><h3>${fmtD(sel, { weekday: 'long', day: 'numeric', month: 'long' })}${pays.includes(calSel) ? ' <span class="tag ok">💵 Payday</span>' : ''}</h3>
+    <div class="list">${si.bills.map(x => `<div class="item"><div class="ico">${em(x.b.cat)}</div><div class="grow"><div class="t">${esc(x.b.name)}</div><div class="s">${FREQ_TXT[x.b.freq]}</div></div>${x.paid ? '<span class="tag ok">paid</span>' : sel < d0() ? '<span class="tag">past</span>' : '<span class="tag warn">due</span>'}<span class="amt">${esc(money(x.b.amount))}</span></div>`).join('')}
+    ${si.spends.map(x => `<div class="item"><div class="ico">${em(x.cat)}</div><div class="grow"><div class="t">${esc(x.note || x.cat)}</div><div class="s">${esc(x.cat)}</div></div><span class="amt">${esc(money(x.amount))}</span></div>`).join('')}
+    ${!si.bills.length && !si.spends.length ? '<div class="empty">Nothing on this day.</div>' : ''}</div>
+    <label class="f" style="margin-top:12px">📝 Note or reminder for this day<textarea id="dayNote" data-d="${calSel}" rows="2" placeholder="e.g. Ask for the deposit back" style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px;color:var(--text);font:inherit;resize:vertical">${esc((state.dayNotes || {})[calSel] || '')}</textarea></label> data-d="${calSel}">+ Log a spend on this day</button></div></div>` : ''}`;
+}
+
+/* ---------- month numbers, Monthly Wrapped, net worth ---------- */
+// what really happened in a month: pay that landed, every bill that fell, spending logged, no-spend days
+function monthStats(base) {
+  const start = new Date(base.getFullYear(), base.getMonth(), 1), end = new Date(base.getFullYear(), base.getMonth() + 1, 1), key = monthKey(start);
+  const upto = end > d0() ? addDays(d0(), 1) : end; // only count days that have happened
+  const cameIn = incomes().reduce((s, i) => s + payDates(i, start, end).length * net(i), 0)
+    + (state.moneyIn || []).filter(x => x.date.startsWith(key)).reduce((s, x) => s + x.amount, 0);
+  const bills = state.bills.reduce((s, b) => s + occurrences(b, start, end).length * b.amount, 0);
+  const sp = state.spends.filter(x => x.date.startsWith(key)), spent = sp.reduce((s, x) => s + x.amount, 0);
+  const byCat = {}; sp.forEach(x => byCat[x.cat] = (byCat[x.cat] || 0) + x.amount);
+  const top = Object.entries(byCat).sort((a, b) => b[1] - a[1])[0];
+  const days = Math.max(0, daysBetween(start, upto)), spendDays = new Set(sp.map(x => x.date)).size;
+  const ticked = (state.paidLog || []).filter(x => x.date.startsWith(key)).length;
+  return { key, start, cameIn, bills, spent, kept: cameIn - bills - spent, byCat, top, days, noSpend: Math.max(0, days - spendDays), ticked, logged: sp.length };
+}
+function netWorth() {
+  const sf = safe();
+  const cash = sf.balance - sf.since + sf.got + sf.savings.reduce((s, a) => s + a.balance, 0);
+  const saved = multi() ? 0 : state.goals.reduce((s, g) => s + (+g.saved || 0), 0); // with accounts, savings already live in a savings account
+  const owed = state.debts.reduce((s, d) => s + (+d.balance || 0), 0) + cardAccts().reduce((s, a) => s + a.balance + cardCharges(a), 0);
+  return { cash, saved, owed, net: cash + saved - owed };
+}
+function wrappedHtml(base) {
+  const m = monthStats(base), prev = monthStats(new Date(base.getFullYear(), base.getMonth() - 1, 1));
+  const last6 = [...Array(6)].map((_, i) => monthStats(new Date(base.getFullYear(), base.getMonth() - i, 1))).filter(x => x.logged || x.cameIn);
+  const best = last6.length > 1 && last6.every(x => x.kept <= m.kept);
+  const name = fmtD(base, { month: 'long' });
+  const tiles = [
+    ['💰', 'You kept', money(m.kept, 0), m.kept >= 0 ? 'pos' : 'neg'],
+    ['🌿', 'No-spend days', `${m.noSpend} of ${m.days}`, ''],
+    ['✅', 'Bills ticked off', String(m.ticked), ''],
+    ['🛒', 'Biggest spend', m.top ? `${m.top[0]} · ${money(m.top[1], 0)}` : 'nothing logged', ''],
+  ];
+  const diff = prev.spent && m.spent ? m.spent - prev.spent : null;
+  return `<div class="wz" style="text-align:center"><div class="wz-emoji">🎉</div><h2>Your ${esc(name)} Wrapped</h2>
+    <p class="muted">${best ? '🏆 Your best month yet!' : m.kept >= 0 ? 'You made it through the month. That counts.' : 'A tough month. You still showed up and tracked it.'}</p>
+    <div class="grid g2" style="gap:10px;margin:16px 0;text-align:left">${tiles.map(t => `<div class="card" style="padding:14px;box-shadow:none"><div style="font-size:20px">${t[0]}</div><div class="small muted">${t[1]}</div><div class="big ${t[3]}" style="font-size:22px">${esc(t[2])}</div></div>`).join('')}</div>
+    <p class="small muted" style="line-height:1.7">${esc(money(m.cameIn, 0))} came in · ${esc(money(m.bills, 0))} of bills · ${esc(money(m.spent, 0))} of spending${diff != null ? ` · ${diff <= 0 ? `${esc(money(-diff, 0))} less spending than last month 👏` : `${esc(money(diff, 0))} more spending than last month`}` : ''}</p>
+    <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" data-act="wrapDone">Lovely, thanks</button></div></div>`;
+}
+let rangeMonths = 1;
+
+/* ---------- savings challenges: tap a box when you put that amount away ---------- */
+const CHAL_TYPES = {
+  env100: { name: '100 Envelope Challenge', emoji: '✉️', blurb: 'Fill envelope 1 with $1, envelope 2 with $2… up to 100. Any order you like.' },
+  week52: { name: '52 Week Challenge', emoji: '📅', blurb: 'Save $1 in week 1, $2 in week 2… $52 in the last week.' },
+  nospend: { name: 'No-Spend Challenge', emoji: '🌿', blurb: 'Every day with no spending logged turns green by itself.' },
+  custom: { name: 'My Own Challenge', emoji: '🎯', blurb: 'Pick a target and how many boxes. Each box is an equal share.' },
+};
+// amount of box i (1-based) in a challenge
+function boxAmount(c, i) { return c.type === 'custom' ? Math.round((+c.target || 0) / Math.max(1, +c.n || 1) * 100) / 100 : c.type === 'nospend' ? 0 : i; }
+function chalStats(c) {
+  const n = c.type === 'week52' ? 52 : c.type === 'nospend' ? (+c.n || 30) : (+c.n || 100);
+  if (c.type === 'nospend') {
+    const start = parse(c.start) || d0(), spendDays = new Set(state.spends.map(x => x.date));
+    const days = [...Array(n)].map((_, i) => { const d = addDays(start, i); return { d, state: d > d0() ? 'future' : spendDays.has(iso(d)) ? 'spent' : d.getTime() === d0().getTime() ? 'today' : 'won' }; });
+    const won = days.filter(x => x.state === 'won').length;
+    return { n, days, won, pct: won / n, saved: 0, total: 0 };
+  }
+  const done = new Set(c.done || []), total = [...Array(n)].reduce((s, _, i) => s + boxAmount(c, i + 1), 0);
+  const saved = [...done].reduce((s, i) => s + boxAmount(c, i), 0);
+  return { n, done, total, saved, pct: total ? saved / total : 0 };
+}
+function vChal() {
+  const cs = state.challenges || [];
+  const savedAll = cs.reduce((s, c) => s + chalStats(c).saved, 0);
+  return `<div class="top"><div><h1 class="hello">Savings challenges ${hq('chal')}</h1><div class="sub">Tap a box when you put that money away. Watch it fill.</div></div><button class="btn" data-act="newChal">+ Start a challenge</button></div>
+  ${cs.length ? `<div class="grid g3"><div class="card"><h3>Saved through challenges</h3><div class="big pos">${esc(money(savedAll, 0))}</div><div class="small muted">${cs.length} challenge${cs.length > 1 ? 's' : ''} going</div></div></div>` : ''}
+  ${cs.map(c => { const t = CHAL_TYPES[c.type], st = chalStats(c);
+    const grid = c.type === 'nospend'
+      ? `<div class="boxes nospend">${st.days.map(x => `<div class="box ${x.state}" title="${esc(fmtD(x.d))}">${x.d.getDate()}</div>`).join('')}</div>`
+      : `<div class="boxes">${[...Array(st.n)].map((_, i) => { const k = i + 1; return `<button class="box ${st.done.has(k) ? 'on' : ''}" data-act="chalBox" data-id="${c.id}" data-v="${k}" title="${esc(money(boxAmount(c, k)))}">${c.type === 'custom' ? k : esc(money(boxAmount(c, k), 0))}</button>`; }).join('')}</div>`;
+    return `<div class="card" style="margin-top:18px"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:12px"><div class="row">${ring(st.pct, 'var(--mint)')}<div><div style="font-size:22px">${t.emoji}</div><h2>${esc(c.name || t.name)}</h2>
+      <div class="small muted">${c.type === 'nospend' ? `${st.won} no-spend day${st.won === 1 ? '' : 's'} of ${st.n}` : `${esc(money(st.saved, 0))} of ${esc(money(st.total, 0))} · ${st.done.size} of ${st.n} boxes`}</div></div></div>
+      <div class="row"><button class="btn danger sm" data-act="delChal" data-id="${c.id}">Remove</button></div></div>
+      <p class="tiny faint" style="margin:10px 0">${esc(t.blurb)}${c.goal ? ` Every box also goes into your “${esc((state.goals.find(g => g.id === c.goal) || {}).name || 'goal')}” goal.` : ''}</p>${grid}
+      ${st.pct >= 1 ? '<div class="small pos" style="margin-top:10px">🎉 Challenge complete. That took real follow-through.</div>' : ''}</div>`; }).join('') || `<div class="card empty" style="margin-top:6px">${Object.entries(CHAL_TYPES).map(([k, t]) => `<div style="margin:8px 0"><b>${t.emoji} ${esc(t.name)}</b><br><span class="small muted">${esc(t.blurb)}</span></div>`).join('')}<button class="btn" data-act="newChal" style="margin-top:10px">Start your first challenge</button></div>`}`;
+}
+function chalForm() {
+  return `<h2>Start a challenge</h2><div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f" style="grid-column:1/-1">Which challenge<select id="cType">${Object.entries(CHAL_TYPES).map(([k, t]) => `<option value="${k}">${t.emoji} ${esc(t.name)}</option>`).join('')}</select></label>
+    <label class="f">Name (optional)<input id="cName" placeholder="e.g. Holiday envelopes"></label>
+    <label class="f">Start date<input id="cStart" type="date" value="${iso(d0())}"></label>
+    <label class="f" data-cshow="env100 nospend custom">How many boxes or days<input id="cN" type="number" min="5" max="365" value="100"></label>
+    <label class="f" data-cshow="custom">Target amount<input id="cT" inputmode="decimal" placeholder="e.g. 1000"></label>
+    <label class="f" data-cshow="env100 week52 custom" style="grid-column:1/-1">Also add each box to a goal (optional)<select id="cGoal"><option value="">No, keep it separate</option>${state.goals.map(g => `<option value="${g.id}">${esc(g.emoji || '🎯')} ${esc(g.name)}</option>`).join('')}</select></label>
+  </div><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveChal">Start</button></div>`;
+}
+function showChalFields() { const t = $('#cType'); if (!t) return; document.querySelectorAll('[data-cshow]').forEach(el => el.style.display = el.dataset.cshow.split(' ').includes(t.value) ? '' : 'none'); const n = $('#cN'); if (n && t.value === 'nospend' && n.value === '100') n.value = 30; if (n && t.value === 'env100' && n.value === '30') n.value = 100; }
+
+/* ---------- income log: for freelancers, side hustles and anyone paid unevenly ---------- */
+const loggedIn = a => { const d = parse(a.balanceDate), bts = a.balanceTs || 0; return (state.moneyIn || []).filter(x => acctOf(x) === a.id && (parse(x.date) > d || (x.date === a.balanceDate && (x.ts || 0) > bts))).reduce((s, x) => s + x.amount, 0); };
+const taxRate = () => Math.min(60, Math.max(0, +state.settings.taxRate || 0));
+// tax owed on income that's sitting in the balance (resets when you update your balance after moving it)
+function taxHold() { return spendAccts().reduce((s, a) => { const d = parse(a.balanceDate), bts = a.balanceTs || 0; return s + (state.moneyIn || []).filter(x => x.tax !== false && acctOf(x) === a.id && (parse(x.date) > d || (x.date === a.balanceDate && (x.ts || 0) > bts))).reduce((t, x) => t + x.amount, 0); }, 0) * taxRate() / 100; }
+function monthIncome(base) { const k = monthKey(base); return (state.moneyIn || []).filter(x => x.date.startsWith(k)).reduce((s, x) => s + x.amount, 0) + incomes().reduce((s, i) => s + payDates(i, new Date(base.getFullYear(), base.getMonth(), 1), new Date(base.getFullYear(), base.getMonth() + 1, 1)).length * net(i), 0); }
+function vIncome() {
+  const months = [...Array(12)].map((_, i) => new Date(d0().getFullYear(), d0().getMonth() - 11 + i, 1));
+  const vals = months.map(monthIncome), past = vals.slice(0, -1).filter(v => v > 0);
+  const last3 = past.slice(-3), last6 = past.slice(-6);
+  const avg3 = last3.length ? last3.reduce((a, b) => a + b, 0) / last3.length : 0, low6 = last6.length ? Math.min(...last6) : 0;
+  const thisM = vals[vals.length - 1], rate = taxRate();
+  const list = (state.moneyIn || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+  return `<div class="top"><div><h1 class="hello">Income ${hq('income')}</h1><div class="sub">Log money as it lands. Plan on your lowest month, not your best.</div></div></div>
+  <div class="grid g3">
+    <div class="card"><h3>This month so far</h3><div class="big pos">${esc(money(thisM, 0))}</div><div class="small muted">${rate ? `${esc(money(thisM * rate / 100, 0))} of it is for tax (${rate}%)` : 'set a tax % below if you need one'}</div></div>
+    <div class="card"><h3>Average · last 3 months</h3><div class="big">${esc(money(avg3, 0))}</div><div class="small muted">a typical month lately</div></div>
+    <div class="card"><h3>Plan on this</h3><div class="big acc">${esc(money(low6, 0))}</div><div class="small muted">your lowest month of the last 6</div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Last 12 months</h3>${bars(vals, months.map(m => fmtD(m, { month: 'short' })))}</div>
+  <div class="card" style="margin-top:18px"><h3>Log money in</h3>
+    <div class="form">
+      <label class="f">Amount<input id="iiAmt" class="bigin" inputmode="decimal" placeholder="0.00"></label>
+      <label class="f">From (client or source)<input id="iiSrc" placeholder="e.g. Website project"></label>
+      <label class="f">Date<input id="iiDate" type="date" value="${iso(d0())}"></label>
+      ${acctSelect('iiAcct', null, 'Paid into')}
+      <label class="f" style="flex-direction:row;align-items:center;gap:10px"><input id="iiTax" type="checkbox" checked style="width:18px;height:18px"> Set tax aside</label>
+      <button class="btn" data-act="addIncome" style="height:46px">Add income</button>
+    </div>
+    <div class="row" style="margin-top:12px;flex-wrap:wrap"><label class="f" style="flex-direction:row;align-items:center;gap:10px">Tax to set aside<input id="stTax" type="number" min="0" max="60" value="${rate}" style="width:80px"> %</label><span class="tiny faint">Tax money stays out of safe to spend until you move it and update your balance.</span></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>History <span class="tiny faint">${list.length} entries</span></h3><div class="list">
+    ${list.slice(0, 60).map(x => `<div class="item"><div class="ico">💵</div><div class="grow"><div class="t">${esc(x.source || 'Money in')}</div><div class="s">${fmtD(parse(x.date))}${multi() ? ' · ' + esc(acctName(acctOf(x))) : ''}${x.tax === false ? ' · no tax' : ''}</div></div><span class="amt pos">+${esc(money(x.amount))}</span><button class="x" data-act="delIncomeLog" data-id="${x.id}" title="Delete">×</button></div>`).join('') || '<div class="empty">Nothing logged yet. Add each payment as it lands.</div>'}
+  </div></div>`;
+}
+
+/* ---------- envelopes: a monthly cap for each kind of spending ---------- */
+function vEnv() {
+  const start = new Date(d0().getFullYear(), d0().getMonth(), 1), key = monthKey(start);
+  const daysLeft = Math.max(1, daysBetween(d0(), new Date(start.getFullYear(), start.getMonth() + 1, 1)));
+  const sp = state.spends.filter(x => x.date.startsWith(key)), byCat = {};
+  sp.forEach(x => byCat[x.cat] = (byCat[x.cat] || 0) + x.amount);
+  const env = Object.entries(state.budgets).map(([c, cap]) => ({ c, cap: +cap || 0, spent: byCat[c] || 0 }));
+  const caps = env.reduce((s, e) => s + e.cap, 0), spent = env.reduce((s, e) => s + e.spent, 0), left = Math.max(0, caps - spent);
+  const loose = Object.keys(byCat).filter(c => !(c in state.budgets));
+  return `<div class="top"><div><h1 class="hello">Envelopes ${hq('env')}</h1><div class="sub">A cap for each kind of spending this month. A line to notice, not a wall.</div></div><button class="btn" data-act="newEnv">+ Add envelope</button></div>
+  <div class="grid g3">
+    <div class="card"><h3>Left across envelopes</h3><div class="big pos">${esc(money(left, 0))}</div><div class="small muted">of ${esc(money(caps, 0))} in caps</div></div>
+    <div class="card"><h3>Spent in ${esc(fmtD(start, { month: 'long' }))}</h3><div class="big">${esc(money(spent, 0))}</div><div class="small muted">${sp.length} spends logged</div></div>
+    <div class="card"><h3>A day from here</h3><div class="big acc">${esc(money(left / daysLeft, 0))}</div><div class="small muted">${daysLeft} days left this month</div></div>
+  </div>
+  <div class="grid g3" style="margin-top:18px">${env.map(e => { const over = e.cap && e.spent > e.cap, pct = e.cap ? Math.min(1, e.spent / e.cap) : (e.spent ? 1 : 0);
+    return `<div class="card"><div class="row" style="justify-content:space-between"><div style="font-size:26px">${em(e.c)}</div><div class="row" style="gap:4px"><button class="btn ghost sm" data-act="editEnv" data-c="${esc(e.c)}">Edit</button>${e.c !== 'Other' ? `<button class="x" data-act="delCat" data-c="${esc(e.c)}" title="Delete envelope">×</button>` : ''}</div></div>
+      <h2>${esc(e.c)}</h2><div class="big ${over ? 'neg' : ''}" style="font-size:24px">${esc(money(Math.max(0, e.cap - e.spent)))}</div><div class="small muted">left of ${esc(money(e.cap, 0))} · ${esc(money(e.spent))} spent</div>
+      <div class="bar ${over ? 'over' : ''}" style="margin-top:10px"><i style="width:${pct * 100}%"></i></div>
+      ${over ? `<div class="small neg" style="margin-top:8px">${esc(money(e.spent - e.cap))} over. No shame, just information.</div>` : e.cap ? `<div class="tiny faint" style="margin-top:8px">${esc(money(Math.max(0, e.cap - e.spent) / daysLeft))} a day for the rest of the month</div>` : '<div class="tiny faint" style="margin-top:8px">No cap yet. Tap Edit to set one.</div>'}</div>`; }).join('')}</div>
+  ${loose.length ? `<div class="card" style="margin-top:18px"><h3>Not in an envelope</h3><p class="small muted" style="margin:0">${loose.map(c => `${esc(c)} (${esc(money(byCat[c], 0))})`).join(' · ')}. Add an envelope with the same name to include it.</p></div>` : ''}
+  ${(() => { // cash stuffing: what goes into each envelope (and sinking fund) from one paycheck
+    const per = { weekly: 12 / 52, biweekly: 12 / 26, twice: .5, monthly: 1 }[state.settings.payFreq] || 1, pay = net(incomes()[0]);
+    const rows = env.filter(e => e.cap > 0).map(e => [em(e.c) + ' ' + e.c, e.cap * per]);
+    const funds = state.goals.filter(g => g.saved < g.target && (+g.monthly || goalNeed(g))).map(g => [(g.emoji || '🎯') + ' ' + g.name, Math.max(+g.monthly || 0, goalNeed(g)?.perMonth || 0) * per]);
+    const bills = state.bills.reduce((s, b) => s + billMonthly(b), 0) * per, all = [...rows, ...funds], used = all.reduce((s, r) => s + r[1], 0) + bills;
+    return `<div class="card" style="margin-top:18px"><h3>💵 Payday cash stuffing <span class="tiny faint">what to put in each envelope from one ${esc(money(pay, 0))} paycheck</span></h3>
+      <div class="list">${all.map(r => `<div class="item"><div class="grow"><div class="t">${esc(r[0])}</div></div><span class="amt">${esc(money(r[1]))}</span></div>`).join('')}
+      <div class="item"><div class="grow"><div class="t">🧾 Bills (their share of this paycheck)</div></div><span class="amt">${esc(money(bills))}</span></div></div>
+      <div class="row" style="justify-content:space-between;margin-top:10px"><span class="small muted">Left after stuffing</span><b class="${pay - used < 0 ? 'neg' : 'pos'}">${esc(money(pay - used))}</b></div>
+      ${pay - used < 0 ? '<p class="tiny neg" style="margin:6px 0 0">Your envelopes and funds ask for more than one paycheck. Lower a cap or two.</p>' : ''}</div>`; })()}`;
+}
+function envForm(c) {
+  const cap = c ? state.budgets[c] : '';
+  return `<h2>${c ? 'Edit envelope' : 'New envelope'}</h2><div class="form" style="grid-template-columns:1fr 1fr">
+    <label class="f">Name<input id="eName" value="${esc(c || '')}" placeholder="e.g. Coffee"></label>
+    <label class="f">Monthly cap<input id="eCap" inputmode="decimal" value="${cap ?? ''}" placeholder="e.g. 60"></label></div>
+    <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveEnv" data-c="${esc(c || '')}">Save envelope</button></div>`;
+}
+
+function vMonth() {
+  const base = new Date(d0().getFullYear(), d0().getMonth() + monthOffset, 1), key = monthKey(base);
+  const sp = state.spends.filter(x => x.date.startsWith(key));
+  const byCat = {}; sp.forEach(x => byCat[x.cat] = (byCat[x.cat] || 0) + x.amount);
+  const cats = [...new Set([...Object.keys(state.budgets), ...Object.keys(byCat)])];
+  const spent = sp.reduce((a, x) => a + x.amount, 0), planned = Object.values(state.budgets).reduce((a, b) => a + +b, 0);
+  const inc = payPerMonth(), billsM = state.bills.reduce((s, b) => s + billMonthly(b), 0);
+  const parts = cats.filter(c => byCat[c]).map((c, i) => ({ label: `${c}: ${money(byCat[c])}`, v: byCat[c], color: PALETTE[i % PALETTE.length] }));
+  // the summary can cover this month or the last 3, 6 or 12 months
+  const range = [...Array(rangeMonths)].map((_, i) => monthStats(new Date(base.getFullYear(), base.getMonth() - i, 1)));
+  const R = k => range.reduce((s, m) => s + m[k], 0), nw = netWorth();
+  const label = rangeMonths === 1 ? fmtD(base, { month: 'long' }) : `last ${rangeMonths} months`;
+  return `<div class="top"><div><h1 class="hello">${fmtD(base, { month: 'long', year: 'numeric' })}</h1><div class="sub">What came in, what went out, and what you kept. ${hq('month')}</div></div>
+    <div class="chips hide-print"><button class="chip" data-act="mPrev">← Previous</button><button class="chip" data-act="mNext">Next →</button><button class="chip" data-act="wrapShow">🎉 ${esc(fmtD(base, { month: 'long' }))} Wrapped</button><button class="chip" data-act="print">🖨️ Print summary</button></div></div>
+  <div class="row hide-print" style="margin-bottom:12px;flex-wrap:wrap"><div class="seg">${[1, 3, 6, 12].map(n => `<button class="${rangeMonths === n ? 'on' : ''}" data-act="range" data-v="${n}">${n === 1 ? 'This month' : n + ' months'}</button>`).join('')}</div><button class="btn ghost sm" data-act="csvRange">Export ${esc(label)} (CSV)</button></div>
+  <div class="grid g3">
+    <div class="card"><h3>Came in · ${esc(label)}</h3><div class="big pos">${esc(money(R('cameIn'), 0))}</div><div class="small muted">${monthOffset === 0 && rangeMonths === 1 ? 'paydays this month, some still to come' : 'every payday in these months'}</div></div>
+    <div class="card"><h3>Bills + spending</h3><div class="big">${esc(money(R('bills') + R('spent'), 0))}</div><div class="small muted">${esc(money(R('bills'), 0))} bills · ${esc(money(R('spent'), 0))} spending</div></div>
+    <div class="card"><h3>You kept</h3><div class="big ${R('kept') >= 0 ? 'acc' : 'neg'}">${esc(money(R('kept'), 0))}</div><div class="small muted">${R('noSpend')} no-spend days</div></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>📊 Net worth <span class="tiny faint">cash and savings, minus what you owe. One honest line.</span></h3>
+    <div class="row" style="flex-wrap:wrap;gap:22px"><div class="stat"><span class="small muted">Cash${nw.saved ? ' + goals saved' : ''}</span><span class="big pos" style="font-size:24px">${esc(money(nw.cash + nw.saved, 0))}</span></div><div class="stat"><span class="small muted">Owed</span><span class="big neg" style="font-size:24px">${esc(money(nw.owed, 0))}</span></div><div class="stat"><span class="small muted">Net worth</span><span class="big ${nw.net >= 0 ? 'acc' : 'neg'}" style="font-size:24px">${esc(money(nw.net, 0))}</span></div></div></div>
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card"><h3>Where it went</h3><div class="row" style="gap:22px;flex-wrap:wrap">${donut(parts.length ? parts : [{ v: 1, color: 'var(--line)', label: 'nothing yet' }])}
+      <div class="legend" style="flex-direction:column;gap:8px">${parts.map(p => `<span><i style="background:${p.color}"></i>${esc(p.label)}</span>`).join('') || '<span>No spending logged this month.</span>'}</div></div></div>
+    <div class="card"><h3>Plan vs spent <span class="tiny faint">${esc(money(spent, 0))} of ${esc(money(planned, 0))}</span></h3>
+      ${cats.map(c => { const b = +state.budgets[c] || 0, s = byCat[c] || 0, pct = b ? s / b : (s ? 1 : 0); return `<div style="margin:10px 0"><div class="row" style="justify-content:space-between"><span class="small">${em(c)} ${esc(c)}</span><span class="small ${s > b && b ? 'neg' : 'muted'}">${esc(money(s, 0))} / <input data-budget="${esc(c)}" value="${b}" inputmode="decimal" style="width:70px;background:transparent;border:0;border-bottom:1px dashed var(--line);color:var(--text);text-align:right">${c !== 'Other' ? `<button class="x" data-act="delCat" data-c="${esc(c)}" title="Delete category" style="font-size:15px;padding:0 4px">×</button>` : '<span style="display:inline-block;width:23px"></span>'}</span></div><div class="bar ${s > b && b ? 'over' : ''}"><i style="width:${Math.min(100, pct * 100)}%"></i></div></div>`; }).join('')}
+      <div class="row" style="margin-top:12px"><input id="newCat" placeholder="New category" style="flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><button class="btn ghost sm" data-act="addCat">Add</button></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>📝 Notes for ${fmtD(base, { month: 'long' })} <span class="tiny faint">anything worth remembering. It doesn't change your numbers.</span></h3>
+    <textarea id="mNote" data-key="${key}" rows="3" placeholder="e.g. Car repair this month, so eating out was cut back." style="width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);font:inherit;resize:vertical">${esc((state.notes || {})[key] || '')}</textarea></div>`;
+}
+
+function vSettings() {
+  const s = state.settings;
+  const f = (id, lbl, val, type = 'text', extra = '') => `<label class="f">${lbl}<input id="${id}" type="${type}" value="${esc(val)}" ${extra}></label>`;
+  return `<div class="top"><div><h1 class="hello">Settings</h1><div class="sub">Make it yours. Changes save instantly on this device.</div></div></div>
+  <div class="grid g2">
+    <div class="card"><h3>You</h3><div class="form">${f('stName', 'Your first name', s.name)}${f('stTitle', 'Name your planner', s.title || '', 'text', 'placeholder="e.g. My money plan"')}
+      <label class="f">Currency<select id="stCur">${CURR.map(c => `<option ${c === s.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+      <label class="f">Theme<select id="stTheme"><option value="dark" ${s.theme === 'dark' ? 'selected' : ''}>Midnight (dark)</option><option value="light" ${s.theme === 'light' ? 'selected' : ''}>Daylight (light)</option><option value="ocean" ${s.theme === 'ocean' ? 'selected' : ''}>Ocean (deep blue)</option><option value="sunset" ${s.theme === 'sunset' ? 'selected' : ''}>Sunset (warm)</option><option value="forest" ${s.theme === 'forest' ? 'selected' : ''}>Forest (soft green)</option></select></label></div></div>
+    <div class="card"><h3>Quick-spend buttons</h3><p class="small muted" style="margin-top:0">One tap on Today logs these straight away. Leave a row empty to remove it.</p>${[...presets(), {}, {}].slice(0, 6).map(p => `<div class="row" data-pr style="margin-bottom:8px"><input class="prL wb" placeholder="e.g. Coffee" value="${esc(p.label || '')}" style="flex:2"><input class="prA wb" inputmode="decimal" placeholder="4" value="${p.amount ?? ''}" style="flex:1"><select class="prC wb" style="flex:2">${Object.keys(state.budgets).map(c => `<option ${c === p.cat ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>`).join('')}<button class="btn ghost sm" data-act="savePresets">Save buttons</button></div><p class="small muted" style="margin-top:0">Simple keeps the everyday screens (Today, Spend, Bills, Calendar) and tucks Debt, Goals and Month away. Nothing is ever deleted.</p><div class="seg"><button class="${!s.simple ? 'on' : ''}" data-act="${s.simple ? 'simple' : ''}">Everything included</button><button class="${s.simple ? 'on' : ''}" data-act="${!s.simple ? 'simple' : ''}">Simple</button></div></div>
+    <div class="card"><h3>Money right now</h3><div class="form">${multi() ? '' : f('stBal', 'Bank balance', s.balance, 'text', 'inputmode="decimal"') + f('stBalDate', 'Checked on', s.balanceDate, 'date')}${f('stAside', 'Set aside (hands off)', s.aside, 'text', 'inputmode="decimal"')}${f('stCush', 'Safety cushion', s.cushion, 'text', 'inputmode="decimal"')}</div>
+      <p class="tiny faint" style="margin:10px 0 0">Tip: update your balance from your banking app whenever you like. Spends logged after the "checked on" date come off automatically.</p></div>
+    <div class="card"><h3>Bank accounts</h3>
+      ${multi() ? `<div class="list">${state.accounts.map(a => `<div class="item"><div class="ico">${a.type === 'savings' ? '🐖' : a.type === 'credit' ? '💳' : '🏦'}</div><div class="grow"><div class="t">${esc(a.name)}</div><div class="s">${a.type === 'savings' ? 'Savings, never counted as spendable' : a.type === 'credit' ? 'Credit card: charges add to what you owe' : 'Spending'} · checked ${fmtD(parse(a.balanceDate))}</div></div><span class="amt">${esc(money(a.balance))}</span><button class="btn ghost sm" data-act="editAcct" data-id="${a.id}">Edit</button></div>`).join('')}</div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn ghost sm" data-act="newAcct">+ Add account</button><button class="btn ghost sm" data-act="editBalance">Update balances</button><span style="flex:1"></span><button class="how" data-act="acctsOff">Go back to one account</button></div>`
+      : `<p class="small muted" style="margin-top:0">Money in more than one place? Turn this on and bills and spends can say which account they come from. Today then shows what's safe in each account, and savings accounts are listed but never counted as spendable.</p><button class="btn ghost" data-act="acctsOn">Use more than one account</button>`}
+    </div>
+    <div class="card"><h3>Your pay</h3><div class="form">${acctSelect('stPayAcct', state.settings.payAccount, 'Paid into')}
+      <label class="f">How often<select id="stFreq">${[['weekly', 'Every week'], ['biweekly', 'Every 2 weeks'], ['twice', 'Twice a month'], ['monthly', 'Once a month']].map(([k, v]) => `<option value="${k}" ${k === s.payFreq ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      ${f('stPay', 'Take-home each payday', s.payAmount, 'text', 'inputmode="decimal"')}${f('stAnchor', 'A recent payday (weekly/2-weekly)', s.payAnchor, 'date')}${f('stD1', 'Pay day of month', s.payDay1, 'number', 'min="1" max="31"')}${f('stD2', 'Second pay day', s.payDay2, 'number', 'min="1" max="31"')}${f('stSplit', 'Auto-moved to savings each payday (%)', s.paySplit || 0, 'number', 'min="0" max="100"')}<label class="f" style="flex-direction:row;align-items:center;gap:10px;grid-column:1/-1"><input id="stVar" type="checkbox" ${s.payVariable ? 'checked' : ''} style="width:18px;height:18px"> My pay changes each time: plan on my lowest paycheck</label>${s.payVariable ? f('stLow', 'Lowest take-home in the last few months', s.payLowest || '', 'text', 'inputmode="decimal" placeholder="e.g. 1600"') : ''}<label class="f" style="flex-direction:row;align-items:center;gap:10px;grid-column:1/-1"><input id="stEarly" type="checkbox" ${s.payEarly ? 'checked' : ''} style="width:18px;height:18px"> Paid on the Friday before when payday falls on a weekend</label></div>
+      <div class="list" style="margin-top:12px">${(state.extraIncomes || []).map(i => `<div class="item"><div class="ico">💵</div><div class="grow"><div class="t">${esc(i.name)}</div><div class="s">${esc(money(i.amount))} · ${({ weekly: 'every week', biweekly: 'every 2 weeks', twice: 'twice a month', monthly: 'monthly' })[i.freq]} · next ${fmtD(payDates(i, addDays(d0(), 1), addDays(d0(), 70))[0])}</div></div><button class="btn ghost sm" data-act="editIncome" data-id="${i.id}">Edit</button></div>`).join('')}</div>
+      <div class="row" style="margin-top:10px;justify-content:space-between;flex-wrap:wrap"><button class="btn ghost sm" data-act="newIncome">+ Add another income</button><span class="small muted">Next payday: <b>${fmtD(nextPayday(), { weekday: 'long', day: 'numeric', month: 'long' })}</b> · about ${esc(money(payPerMonth(), 0))}/month</span></div>
+      <p class="tiny faint" style="margin:8px 0 0">Two jobs, a partner's pay or benefits on different days? Add each one and safe-to-spend counts to whichever lands next.</p></div>
+    <div class="card"><h3>Keep your numbers safe</h3><p class="small muted" style="margin-top:0">Everything lives on this device only. Download a backup now and then, and restore it on any device.</p>
+      <div class="row" style="flex-wrap:wrap"><button class="btn mint" data-act="backup">⬇ Download backup</button><label class="btn ghost" style="cursor:pointer">⬆ Restore backup<input type="file" id="restore" accept=".json" hidden></label><button class="btn ghost" data-act="csv">Export spending (CSV)</button></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="row" style="flex-wrap:wrap"><button class="btn ghost sm" data-act="setup">Run setup again</button><button class="btn ghost sm" data-act="loadDemo">Show example numbers</button><button class="btn danger sm" data-act="startFresh">Start fresh (empty)</button></div></div>
+  </div>`;
+}
+
+/* ---------- welcome back: catch up after days away ---------- */
+function welcomeBack(force) {
+  const last = state.lastOpen; state.lastOpen = iso(d0()); save();
+  if (!force && (state.demo || !last)) return;
+  const from = force ? addDays(d0(), -9) : parse(last), gap = daysBetween(from, d0());
+  if (!force && gap < 5) return;
+  const due = state.bills.flatMap(b => unpaid(b, occurrences(b, from, addDays(d0(), 1))).map(d => ({ b, d })));
+  modal(`<div class="wz"><div class="wz-emoji">👋</div><h2>Welcome back${state.settings.name ? ', ' + esc(state.settings.name) : ''}.</h2>
+    <p class="muted">It's been ${gap} days. Life happens. Two quick steps and every number is right again.</p>
+    <h3 style="margin:16px 0 6px;font-size:12px;letter-spacing:1px;color:var(--muted)">1 · BILLS THAT CAME DUE</h3>
+    <div class="list">${due.map(({ b, d }, i) => `<label class="item" style="cursor:pointer"><input type="checkbox" data-wbk="${i}" data-id="${b.id}" data-d="${iso(d)}" checked style="width:18px;height:18px"><div class="grow"><div class="t">${esc(b.name)}</div><div class="s">${fmtD(d)}</div></div><span class="amt">${esc(money(b.amount))}</span></label>`).join('') || '<div class="empty" style="padding:10px">Nothing came due. Nice.</div>'}</div>
+    ${due.length ? '<p class="tiny faint">Untick anything you haven\'t paid yet.</p>' : ''}
+    <h3 style="margin:16px 0 6px;font-size:12px;letter-spacing:1px;color:var(--muted)">2 · WHAT'S IN YOUR BANK NOW?</h3>
+    ${multi() ? balanceInputs() : `<label class="f"><input id="wbBal" class="bigin" inputmode="decimal" placeholder="e.g. ${esc(String(state.settings.balance))}" autofocus></label>`}
+    <div class="row" style="margin-top:20px;flex-wrap:wrap"><button class="how" data-act="close">Later</button><span style="flex:1"></span><button class="btn" data-act="wbSave">Update everything</button></div></div>`);
+}
+/* ---------- render ---------- */
+function render() {
+  document.documentElement.dataset.theme = state.settings.theme;
+  const base = navBase();
+  const shown = state.settings.simple ? base.filter(([k]) => !['debt', 'goals', 'month'].includes(k)) : base;
+  $('#brandName').textContent = state.settings.title || ED.name; $('#brandSub').textContent = ED.sub; document.title = (state.settings.title || ED.name) + ' · ' + ED.sub;
+  const navHtml = shown.map(([k, t]) => `<button class="nav ${view === k ? 'on' : ''}" data-go="${k}">${I[k]}<span>${t}</span></button>`).join('');
+  $('#nav').innerHTML = navHtml;
+  const tabs = state.settings.simple ? ['today', 'spend', 'bills', 'cal', 'settings'] : (ED.tabs || ['today', 'spend', 'bills', 'cal', 'debt']), inMore = !tabs.includes(view);
+  $('#tabbar').innerHTML = tabs.map(k => VIEWS.find(v => v[0] === k)).filter(Boolean).map(([k, t]) => `<button class="${view === k ? 'on' : ''}" data-go="${k}">${I[k]}<span>${t}</span></button>`).join('') +
+    `<button class="${inMore ? 'on' : ''}" data-act="more">${I.more}<span>More</span></button>`;
+  $('#main').innerHTML = ({ today: vToday, spend: vSpend, income: vIncome, env: vEnv, chal: vChal, bills: vBills, cal: vCal, debt: vDebt, goals: vGoals, month: vMonth, settings: vSettings })[view]();
+  const m = $('#main'); m.classList.toggle('enter', render.last !== view); render.last = view;
+  bindInputs();
+}
+function toast(msg, undo) {
+  const t = $('#toast'); t.innerHTML = esc(msg) + (undo ? ' <button class="undo" data-act="undo">Undo</button>' : '');
+  t.classList.toggle('act', !!undo); t.classList.add('on'); clearTimeout(toast.t); const hide = () => { toast.t = setTimeout(() => t.classList.remove('on', 'act'), undo ? 8000 : 2400); }; hide(); t.onmouseenter = () => clearTimeout(toast.t); t.onmouseleave = hide;
+}
+let lastDeleted = null;
+function removeItem(arr, id, label) {
+  const i = state[arr].findIndex(x => x.id === id); if (i < 0) return;
+  lastDeleted = { arr, item: state[arr][i], i }; state[arr].splice(i, 1);
+  closeModal(); save(); render(); toast(`${label} deleted`, true);
+}
+let pendingConfirm = null;
+function askConfirm(title, text, ok, fn, danger) {
+  pendingConfirm = fn;
+  modal(`<h2>${esc(title)}</h2><p class="muted" style="line-height:1.6">${esc(text)}</p><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn ${danger ? 'danger' : ''}" data-act="confirmOk">${esc(ok)}</button></div>`);
+}
+
+/* ---------- first-run setup wizard ---------- */
+let wiz = 0;
+const COMMON_BILLS = [['Rent', 'Home', '🏠'], ['Mortgage', 'Home', '🏡'], ['Phone', 'Phone & internet', '📱'], ['Internet', 'Phone & internet', '📶'], ['Electric', 'Utilities', '💡'], ['Water', 'Utilities', '🚿'], ['Streaming', 'Subscriptions', '📺'], ['Car payment', 'Debt', '🚗'], ['Car insurance', 'Insurance', '🛡️'], ['Gym', 'Health', '🏋️'], ['Childcare', 'Kids', '🧸'], ['Credit card', 'Debt', '💳']];
+function wizard(step = wiz) {
+  wiz = step; const s = state.settings, steps = 5;
+  const dots = `<div class="dots">${[...Array(steps)].map((_, i) => `<i class="${i <= step ? 'on' : ''}"></i>`).join('')}</div>`;
+  const nav = (back, next, nextLabel = 'Next') => `<div class="row" style="margin-top:22px">${back ? `<button class="btn ghost" data-act="wizBack">Back</button>` : ''}<span style="flex:1"></span>${step < 4 ? `<button class="how" data-act="wizSkip">Skip for now</button>` : ''}<button class="btn" data-act="${next}">${nextLabel}</button></div>`;
+  let body = '';
+  if (step === 0) body = `<div class="wz-emoji">👋</div><h2>Let's set up your ${esc(ED.name)}</h2><p class="muted">Five quick steps, about two minutes. You can change anything later.</p>
+    <div class="form" style="grid-template-columns:1fr 1fr;margin-top:14px"><label class="f">Your first name<input id="wName" value="${esc(s.name)}" placeholder="e.g. Sam" autofocus></label>
+    <label class="f">Currency<select id="wCur">${CURR.map(c => `<option ${c === s.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label></div>${nav(false, 'wizNext', "Let's go")}`;
+  if (step === 1) body = `<div class="wz-emoji">🏦</div><h2>What's in your bank right now?</h2><p class="muted">Open your banking app and copy your main account's balance. No bank login needed, ever.</p>
+    <label class="f" style="margin-top:14px">Balance today<input id="wBal" class="bigin" inputmode="decimal" value="${s.balance || ''}" placeholder="0.00" autofocus></label>
+    <div class="form" style="grid-template-columns:1fr 1fr;margin-top:12px"><label class="f">Money set aside (hands off)<input id="wAside" inputmode="decimal" value="${s.aside || ''}" placeholder="0"></label><label class="f">Safety cushion<input id="wCush" inputmode="decimal" value="${s.cushion || ''}" placeholder="50"></label></div>
+    <p class="tiny faint">"Set aside" is money already promised to something. The cushion is a little extra kept back, just in case.</p>${nav(true, 'wizNext')}`;
+  if (step === 2) body = `<div class="wz-emoji">💵</div><h2>How do you get paid?</h2><p class="muted">So the planner can count down to your next payday.</p>
+    <div class="seg" style="margin:14px 0;flex-wrap:wrap">${[['weekly', 'Every week'], ['biweekly', 'Every 2 weeks'], ['twice', 'Twice a month'], ['monthly', 'Monthly']].map(([k, v]) => `<button class="${s.payFreq === k ? 'on' : ''}" data-act="wizFreq" data-v="${k}">${v}</button>`).join('')}</div>
+    <div class="form" style="grid-template-columns:1fr 1fr"><label class="f">Take-home each payday<input id="wPay" inputmode="decimal" value="${s.payAmount || ''}" placeholder="0.00"></label>
+    ${s.payFreq === 'weekly' || s.payFreq === 'biweekly' ? `<label class="f">Date of your last payday<input id="wAnchor" type="date" value="${s.payAnchor}"></label>` : `<label class="f">Pay day of month<input id="wD1" type="number" min="1" max="31" value="${s.payDay1}"></label>${s.payFreq === 'twice' ? `<label class="f">Second pay day<input id="wD2" type="number" min="1" max="31" value="${s.payDay2}"></label>` : ''}`}</div>${nav(true, 'wizNext')}`;
+  if (step === 3) body = `<div class="wz-emoji">🧾</div><h2>Add your regular bills</h2><p class="muted">Tap one to add it. Just the amount and the day of the month. You can add weekly or every-few-months bills later.</p>
+    <div class="quick" style="margin:14px 0">${COMMON_BILLS.map(([n, c, e]) => `<button class="chip ${state.bills.some(b => b.name === n) ? 'on' : ''}" data-act="wizPick" data-n="${n}" data-c="${c}">${e} ${n}</button>`).join('')}</div>
+    <div class="list" id="wBills">${state.bills.map(b => `<div class="item"><div class="ico">${em(b.cat)}</div><div class="grow"><input data-wb="${b.id}" data-k="name" value="${esc(b.name)}" class="wb"></div><input data-wb="${b.id}" data-k="amount" class="wb" inputmode="decimal" placeholder="Amount" value="${b.amount || ''}" style="width:92px"><span class="tiny muted">day</span><input data-wb="${b.id}" data-k="day1" class="wb" type="number" min="1" max="31" value="${b.day1 || 1}" style="width:58px"><button class="x" data-act="wizDelBill" data-id="${b.id}">×</button></div>`).join('') || '<div class="empty" style="padding:12px">No bills yet. Tap the ones you have above.</div>'}</div>
+    <button class="how" data-act="wizCustom" style="margin-top:10px">+ Something else</button>${nav(true, 'wizNext')}`;
+  if (step === 4) { const sf = safe(); body = `<div class="wz-emoji">✨</div><h2>You're all set${s.name ? ', ' + esc(s.name) : ''}.</h2><p class="muted">Here's what's safe to spend today:</p>
+    <div class="big" style="font-size:46px;margin:6px 0">${esc(money(Math.max(0, sf.perDay)))}</div><p class="muted small">${esc(money(Math.max(0, sf.total)))} until payday on ${fmtD(sf.p)} · after bills, money set aside and your cushion.</p>
+    <p class="small" style="line-height:1.7;margin-top:14px">Your routine: log spends as they happen · tick bills when paid · update your balance whenever you like.</p>${nav(true, 'wizDone', 'Open my dashboard')}`; }
+  modal(`<div class="wz">${dots}${body}</div>`); $('#modal').dataset.wizard = '1';
+  const auto = $('#modalCard [autofocus]'); if (auto) setTimeout(() => auto.focus(), 60);
+}
+function wizSave() {
+  const s = state.settings, v = id => { const el = $('#' + id); return el ? el.value : null; };
+  if (wiz === 0) { s.name = v('wName').trim(); s.currency = v('wCur'); }
+  if (wiz === 1) { s.balance = num(v('wBal')); s.aside = num(v('wAside')); s.cushion = num(v('wCush')); s.balanceDate = iso(d0()); s.balanceTs = Date.now(); }
+  if (wiz === 2) { s.payAmount = num(v('wPay')); if (v('wAnchor') != null) s.payAnchor = v('wAnchor'); if (v('wD1') != null) s.payDay1 = num(v('wD1')) || 1; if (v('wD2') != null) s.payDay2 = num(v('wD2')) || 15; }
+  if (wiz === 3) document.querySelectorAll('[data-wb]').forEach(el => { const b = state.bills.find(x => x.id === el.dataset.wb); if (!b) return; b[el.dataset.k] = el.dataset.k === 'name' ? el.value : num(el.value); });
+  if (wiz === 3) state.bills = state.bills.filter(b => b.name && b.amount > 0);
+  save();
+}
+function modal(html) { $('#modalCard').innerHTML = html; $('#modal').classList.add('on'); showFields(); showIncomeFields(); setTimeout(() => { const el = $('#modalCard [autofocus]') || $('#modalCard input:not([type=checkbox]):not([type=file]), #modalCard select') || $('#modalCard .btn:not(.ghost)'); if (el) { el.focus(); if (el.select && el.value) el.select(); } }, 80); }
+function closeModal() { $('#modal').classList.remove('on'); delete $('#modal').dataset.wizard; }
+function showFields() { const f = $('#bFreq'); if (!f) return; document.querySelectorAll('[data-show]').forEach(el => el.style.display = el.dataset.show.split(' ').includes(f.value) ? '' : 'none'); }
+function commit(msg) { state.demo = state.demo && !msg?.endsWith('!demo'); save(); render(); if (msg) toast(msg.replace('!demo', '')); }
+
+function bindInputs() {
+  const map = { stName: ['name', 's'], stCur: ['currency', 's'], stTheme: ['theme', 's'], stBal: ['balance', 'n'], stBalDate: ['balanceDate', 's'], stAside: ['aside', 'n'], stCush: ['cushion', 'n'], stFreq: ['payFreq', 's'], stPay: ['payAmount', 'n'], stAnchor: ['payAnchor', 's'], stD1: ['payDay1', 'n'], stD2: ['payDay2', 'n'], stSplit: ['paySplit', 'n'], stLow: ['payLowest', 'n'], stTitle: ['title', 's'], stPayAcct: ['payAccount', 's'] };
+  const vv = $('#stVar'); if (vv) vv.onchange = () => { state.settings.payVariable = vv.checked; save(); render(); toast(vv.checked ? 'Planning on your lowest paycheck' : 'Planning on your usual paycheck'); };
+  const ee = $('#stEarly'); if (ee) ee.onchange = () => { state.settings.payEarly = ee.checked; save(); render(); toast('Saved'); };
+  const tx = $('#stTax'); if (tx) tx.onchange = () => { state.settings.taxRate = Math.min(60, Math.max(0, num(tx.value))); save(); render(); toast('Tax rate saved'); };
+  for (const [id, [k, t]] of Object.entries(map)) { const el = $('#' + id); if (el) el.onchange = () => { state.settings[k] = t === 'n' ? num(el.value) : el.value; if (k === 'balance' || k === 'balanceDate') state.settings.balanceTs = Date.now(); save(); render(); toast('Saved'); }; }
+  const ex = $('#dExtra'); if (ex) ex.onchange = () => { state.debtExtra = num(ex.value); commit('Plan updated'); };
+  document.querySelectorAll('[data-budget]').forEach(el => el.onchange = () => { state.budgets[el.dataset.budget] = num(el.value); commit('Budget updated'); });
+  const dn = $('#dayNote'); if (dn) dn.oninput = () => { state.dayNotes ||= {}; if (dn.value.trim()) state.dayNotes[dn.dataset.d] = dn.value; else delete state.dayNotes[dn.dataset.d]; save(); };
+  const mn = $('#mNote'); if (mn) mn.oninput = () => { (state.notes ||= {})[mn.dataset.key] = mn.value; save(); };
+  const wi = $('#wi'); if (wi) wi.oninput = () => {
+    const v = +wi.value, sf = safe(), after = (sf.total - v) / sf.days;
+    $('#wiVal').textContent = money(v, 0); $('#fcBox').innerHTML = forecastBox(v);
+    $('#wiTxt').innerHTML = v ? `Safe to spend would drop to <b class="${after < 0 ? 'neg' : ''}">${esc(money(Math.max(0, after)))}/day</b> until payday${after < 0 ? ' (it would eat into bills)' : ''}.` : 'Drag to test a purchase before any money moves.';
+  };  const bd = $('#bd'); if (bd) bd.onkeydown = e => { if (e.key === 'Enter') act('addDump'); };
+  const qa = $('#qa'); if (qa) qa.onkeydown = e => { if (e.key === 'Enter') act('quickAdd'); };
+  const rs = $('#restore'); if (rs) rs.onchange = () => { const file = rs.files[0]; if (!file) return; const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.settings) throw 0; state = d; commit('Backup restored'); } catch (e) { toast("That file isn't a backup from this planner"); } }; r.readAsText(file); };
+}
+function download(name, text, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }
+
+// highlight empty/invalid boxes, jump to the first one, say what's missing
+function need(checks, msg) {
+  document.querySelectorAll('.bad').forEach(el => el.classList.remove('bad'));
+  const bad = checks.filter(([sel, ok]) => !ok($(sel)?.value ?? '')).map(([sel]) => $(sel)).filter(Boolean);
+  if (!bad.length) return true;
+  bad.forEach(el => { el.classList.add('bad'); el.addEventListener('input', () => el.classList.remove('bad'), { once: true }); });
+  bad[0].focus(); toast(msg); return false;
+}
+const filled = v => String(v).trim() !== '', positive = v => num(v) > 0;
+
+function act(a, el = {}) {  const ds = el.dataset || {}, id = ds.id;
+  const find = (arr) => state[arr].find(x => x.id === id);
+  switch (a) {
+    case 'theme': state.settings.theme = ['light', 'forest', 'sunset'].includes(state.settings.theme) ? 'dark' : 'light'; save(); render(); break;
+    case 'focus': document.body.classList.toggle('focus'); toast(document.body.classList.contains('focus') ? 'Focus mode: just the essentials' : 'Everything is back'); break;
+    case 'explain': { const x = $('#explain'); x.hidden = !x.hidden; break; }
+    case 'paid': { const b = find('bills'); lastDeleted = { paid: true, id: b.id, prev: b.paidThrough }; b.paidThrough = ds.d; (state.paidLog ||= []).push({ id: b.id, account: acctOf(b), date: ds.d, amount: b.amount, ts: Date.now() }); state.paidLog = state.paidLog.slice(-300); state.demo = state.demo; save(); render(); toast(`${b.name} marked paid ✓`, true); break; }
+    case 'pickCat': { const q = $('#qa'); const n = (q.value.match(/[\d.]+/) || [''])[0]; q.value = `${n} ${ds.c}`.trim(); q.focus(); break; }
+    case 'quickAdd': { if (demoBlocked()) { demoWall(); return; }
+      const v = $('#qa').value.trim(); const m = v.match(/([\d]+(?:\.\d+)?)/); if (!m) { need([['#qa', () => false]], 'Type an amount first, like "12 coffee"'); return; }
+      const rest = v.replace(m[0], '').trim(); const cats = Object.keys(state.budgets);
+      const w = rest.toLowerCase().split(' ')[0];
+      const cat = cats.find(c => w && c.toLowerCase().startsWith(w)) || cats.find(c => (WORD_CAT[c] || []).some(k => w.startsWith(k))) || 'Other';
+      state.spends.push({ id: uid(), ts: Date.now(), date: iso(d0()), amount: +m[1], cat, note: rest && cat.toLowerCase() !== rest.toLowerCase() ? rest : '' });
+      commit(`Logged ${money(+m[1])} · ${cat}`); break; }
+    case 'amt': $('#sAmt').value = ds.v; break;
+    case 'addSpend': { if (demoBlocked()) { demoWall(); return; } if (!need([['#sAmt', positive]], 'Type how much you spent')) return; const amt = num($('#sAmt').value); state.spends.push({ id: uid(), ts: Date.now(), date: $('#sDate').value || iso(d0()), amount: amt, cat: $('#sCat').value, note: $('#sNote').value.trim(), account: $('#sAcct')?.value || undefined }); commit('Spend added'); break; }
+    case 'delSpend': removeItem('spends', id, 'Spend'); break;
+    case 'editSpend': { const x = find('spends'); modal(`<h2>Edit spend</h2><div class="form" style="grid-template-columns:1fr 1fr"><label class="f">Amount<input id="eA" value="${x.amount}"></label><label class="f">Date<input id="eD" type="date" value="${x.date}"></label><label class="f">Category<select id="eC">${Object.keys(state.budgets).map(c => `<option ${c === x.cat ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label><label class="f">Note<input id="eN" value="${esc(x.note)}"></label>${acctSelect('eAcct', x.account, 'Paid from')}</div><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveSpend" data-id="${x.id}">Save</button></div>`); break; }
+    case 'saveSpend': { const x = find('spends'); Object.assign(x, { amount: num($('#eA').value), date: $('#eD').value, cat: $('#eC').value, note: $('#eN').value, account: $('#eAcct')?.value || x.account }); closeModal(); commit('Saved'); break; }
+    case 'newBill': modal(billForm()); break;
+    case 'editBill': modal(billForm(find('bills'))); break;
+    case 'saveBill': {
+      if (!need([['#bName', filled], ['#bAmt', positive]], 'Add the bill name and amount (the grey text is only an example)')) return; const name = $('#bName').value.trim(), amount = num($('#bAmt').value);
+      const data = { name, amount, freq: $('#bFreq').value, cat: $('#bCat').value, day1: num($('#bD1').value) || 1, day2: num($('#bD2').value) || 15, anchor: $('#bAnchor').value, every: num($('#bEvery').value) || 6, smooth: $('#bSmooth').checked, account: $('#bAcct')?.value || undefined };
+      if (id) { const b = find('bills'), changed = ['freq', 'day1', 'day2', 'anchor', 'every'].some(k => b[k] !== data[k]); Object.assign(b, data); if (changed) { b.paidThrough = null; settlePast(b); } } else state.bills.push(settlePast({ id: uid(), paidThrough: null, ...data }));
+      closeModal(); commit('Bill saved'); break; }
+    case 'delBill': removeItem('bills', id, 'Bill'); break;
+    case 'newDebt': modal(debtForm()); break;
+    case 'editDebt': modal(debtForm(find('debts'))); break;
+    case 'saveDebt': { if (!need([['#xName', filled], ['#xBal', positive], ['#xMin', positive]], 'Add the name, balance and minimum payment')) return; const data = { name: $('#xName').value.trim() || 'Debt', balance: num($('#xBal').value), apr: num($('#xApr').value), min: num($('#xMin').value) }; if (id) { const x = find('debts'); Object.assign(x, data); x.start = Math.max(x.start || 0, data.balance); } else state.debts.push({ id: uid(), start: data.balance, payments: [], ...data }); closeModal(); commit('Debt saved'); break; }
+    case 'delDebt': removeItem('debts', id, 'Debt'); break;
+    case 'method': state.debtMethod = ds.v; commit(); break;
+    case 'newGoal': modal(goalForm()); break;
+    case 'editGoal': modal(goalForm(find('goals'))); break;
+    case 'saveGoal': { if (!need([['#gName', filled], ['#gT', positive]], 'Give your goal a name and a target')) return; const data = { name: $('#gName').value.trim() || 'Goal', emoji: $('#gEmoji').value || '🎯', target: num($('#gT').value), saved: num($('#gS').value), monthly: num($('#gM').value), by: $('#gBy').value || '', reserve: $('#gRes').checked }; if (id) Object.assign(find('goals'), data); else state.goals.push({ id: uid(), ...data }); closeModal(); commit('Goal saved'); break; }
+    case 'delGoal': removeItem('goals', id, 'Goal'); break;
+    case 'addToGoal': { const g = find('goals'); modal(`<h2>Add to ${esc(g.name)}</h2><label class="f">Amount<input id="agA" class="bigin" inputmode="decimal" autofocus></label><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn mint" data-act="doAddGoal" data-id="${g.id}">Add</button></div>`); break; }
+    case 'doAddGoal': { if (!need([['#agA', positive]], 'Type how much you are adding')) return; const g = find('goals'); g.saved += num($('#agA').value); closeModal(); commit(g.saved >= g.target ? `🎉 ${g.name} reached!` : 'Nice. Added.'); break; }
+    case 'mPrev': monthOffset--; render(); break;
+    case 'mNext': monthOffset++; render(); break;
+    case 'delCat': {
+      const c = ds.c, n = state.spends.filter(x => x.cat === c).length;
+      const go = () => { delete state.budgets[c]; state.spends.forEach(x => { if (x.cat === c) x.cat = 'Other'; }); if (!('Other' in state.budgets)) state.budgets.Other = 0; commit(`Category "${c}" deleted`); };
+      if (n) askConfirm(`Delete "${c}"?`, `Its ${n} spend${n > 1 ? 's' : ''} will move to Other, so your totals stay right.`, 'Delete category', go, true); else go();
+      break; }
+    case 'addCat': { const c = $('#newCat').value.trim(); if (!c) { toast('Type a name for the new category first'); $('#newCat').focus(); break; } if (c in state.budgets) { toast('You already have that category'); break; } state.budgets[c] = 0; commit('Category added'); break; }
+    case 'backup': download(`${slug()}-backup-${iso(d0())}.json`, JSON.stringify(state, null, 1), 'application/json'); toast('Backup downloaded'); break;
+    case 'csv': download(`${slug()}-spending-${iso(d0())}.csv`, 'date,amount,category,note\n' + state.spends.map(x => [x.date, x.amount, x.cat, `"${(x.note || '').replace(/"/g, '""')}"`].join(',')).join('\n'), 'text/csv'); break;
+    case 'startFresh': askConfirm(state.demo ? 'Start your own plan?' : 'Start fresh?', state.demo ? 'The example numbers will be cleared and a quick setup will walk you through your own.' : 'This clears everything in this planner. Download a backup first if you might want it back.', state.demo ? 'Start setup' : 'Clear everything', () => { state = blank(); save(); view = 'today'; render(); wizard(0); }, !state.demo); break;
+    case 'loadDemo': askConfirm('Show example numbers?', 'Everything you have typed will be replaced by the demo. Download a backup first if you want to keep it.', 'Show examples', () => { const th = state.settings.theme; state = demo(); state.settings.theme = th; save(); view = 'today'; render(); }, true); break;
+    case 'confirmOk': { const fn = pendingConfirm; pendingConfirm = null; closeModal(); fn && fn(); break; }
+    case 'undo': if (lastDeleted?.paid) { const b = state.bills.find(x => x.id === lastDeleted.id); if (b) b.paidThrough = lastDeleted.prev; state.paidLog.pop(); lastDeleted = null; save(); render(); toast('Back to unpaid'); } else if (lastDeleted) { state[lastDeleted.arr].splice(lastDeleted.i, 0, lastDeleted.item); lastDeleted = null; save(); render(); toast('Restored'); } break;
+    case 'setup': wizard(0); break;
+    case 'wizNext': wizSave(); wizard(wiz + 1); break;
+    case 'wizSkip': wizard(wiz + 1); break;
+    case 'wizBack': wizSave(); wizard(wiz - 1); break;
+    case 'wizFreq': wizSave(); state.settings.payFreq = ds.v; save(); wizard(2); break;
+    case 'wizPick': { wizSave(); const ex = state.bills.find(b => b.name === ds.n); if (ex) state.bills = state.bills.filter(b => b !== ex); else state.bills.push({ id: uid(), name: ds.n, amount: 0, freq: 'monthly', day1: 1, cat: ds.c, paidThrough: null, _new: true }); save(); wizard(3); const inp = document.querySelector(`[data-wb="${(state.bills.at(-1) || {}).id}"][data-k="amount"]`); if (!ex && inp) inp.focus(); break; }
+    case 'wizCustom': { wizSave(); state.bills.push({ id: uid(), name: '', amount: 0, freq: 'monthly', day1: 1, cat: 'Other', paidThrough: null }); wizard(3); const n = document.querySelectorAll('[data-k="name"]'); n[n.length - 1]?.focus(); break; }
+    case 'wizDelBill': wizSave(); state.bills = state.bills.filter(b => b.id !== id); save(); wizard(3); break;
+    case 'wizDone': wizSave(); state.demo = false; state.bills = state.bills.filter(b => b.name && b.amount > 0).map(({ _new, ...b }) => settlePast(b)); save(); closeModal(); view = 'today'; render(); toast('All set. Welcome to your ' + ED.name + ' ✨'); break;
+    case 'editBalance': modal(`<h2>Update your balance${multi() ? 's' : ''}</h2><p class="muted small">Copy ${multi() ? 'each one' : 'it'} from your banking app. Anything you log from now on comes off automatically.</p>${multi() ? balanceInputs(true) : `<label class="f" style="margin-top:12px">Balance right now<input id="ubB" class="bigin" inputmode="decimal" value="${state.settings.balance}" autofocus></label>`}<div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="saveBalance">Save balance</button></div>`); setTimeout(() => $('#ubB')?.select(), 60); break;
+    case 'saveBalance': { if (multi()) { document.querySelectorAll('[data-ub]').forEach(el => { const a = state.accounts.find(x => x.id === el.dataset.ub); if (a && String(el.value).trim() !== '' && num(el.value) !== a.balance) { a.balance = num(el.value); a.balanceDate = iso(d0()); a.balanceTs = Date.now(); } }); } else { const s = state.settings; s.balance = num($('#ubB').value); s.balanceDate = iso(d0()); s.balanceTs = Date.now(); } closeModal(); commit('Balance updated'); break; }
+    case 'wbSave': {
+      document.querySelectorAll('[data-wbk]').forEach(c => { if (!c.checked) return; const b = state.bills.find(x => x.id === c.dataset.id); if (b && (!b.paidThrough || c.dataset.d > b.paidThrough)) b.paidThrough = c.dataset.d; });
+      if (multi()) { document.querySelectorAll('[data-ub]').forEach(el => { const a = state.accounts.find(x => x.id === el.dataset.ub); if (a && String(el.value).trim() !== '') { a.balance = num(el.value); a.balanceDate = iso(d0()); a.balanceTs = Date.now(); } }); } else { const v = $('#wbBal').value; if (String(v).trim() !== '') { const s = state.settings; s.balance = num(v); s.balanceDate = iso(d0()); s.balanceTs = Date.now(); } }
+      closeModal(); commit('All caught up ✨'); break; }
+    case 'addDump': { const v = $('#bd').value.trim(); if (!v) { need([['#bd', () => false]], 'Type the thought first'); return; } (state.dump ||= []).push({ id: uid(), text: v, ts: Date.now() }); save(); render(); setTimeout(() => $('#bd')?.focus(), 30); toast('Out of your head ✓'); break; }
+    case 'delDump': removeItem('dump', id, 'Note'); break;
+    case 'simple': state.settings.simple = !state.settings.simple; if (state.settings.simple && ['debt', 'goals', 'month'].includes(view)) view = 'today'; save(); render(); toast(state.settings.simple ? 'Simple view: just the everyday screens' : 'Everything is back'); break;
+    case 'acctsOn': { const s = state.settings; state.accounts = [{ id: 'main', name: 'Main account', type: 'spending', balance: +s.balance || 0, balanceDate: s.balanceDate || iso(d0()), balanceTs: s.balanceTs || 0 }]; save(); render(); modal(acctForm()); toast('Your current balance is now "Main account". Add the others.'); break; }
+    case 'acctsOff': askConfirm('Go back to one account?', 'Your spending accounts are added together into one balance. Savings accounts are dropped from the planner. Bills and spends stay as they are.', 'Use one account', () => {
+      const s = state.settings, sp = spendAccts();
+      s.balance = sp.reduce((t, a) => t + a.balance - spentSince(a), 0); s.balanceDate = iso(d0()); s.balanceTs = Date.now();
+      state.accounts = []; commit('Back to one account'); }); break;
+    case 'newAcct': modal(acctForm()); break;
+    case 'editAcct': modal(acctForm(state.accounts.find(x => x.id === id))); break;
+    case 'saveAcct': {
+      if (!need([['#aName', filled], ['#aBal', v => String(v).trim() !== '']], 'Give the account a name and its balance')) return;
+      const data = { name: $('#aName').value.trim(), type: $('#aType').value, balance: num($('#aBal').value) };
+      if (id) { const a = state.accounts.find(x => x.id === id); if (a.balance !== data.balance) { a.balanceDate = iso(d0()); a.balanceTs = Date.now(); } Object.assign(a, data); }
+      else state.accounts.push({ id: uid(), balanceDate: iso(d0()), balanceTs: Date.now(), ...data });
+      if (!spendAccts().length) { state.accounts[0].type = 'spending'; toast('At least one account has to be for spending'); }
+      closeModal(); commit('Account saved'); break; }
+    case 'delAcct': {
+      const used = state.bills.filter(b => b.account === id).length + state.spends.filter(x => x.account === id).length;
+      askConfirm(`Delete ${acctName(id)}?`, used ? `${used} bills or spends use it. Bills move to your first spending account; past spends stay in your reports.` : 'Nothing uses this account.', 'Delete account', () => {
+        state.accounts = state.accounts.filter(a => a.id !== id);
+        if (!spendAccts().length && state.accounts[0]) state.accounts[0].type = 'spending';
+        // bills and incomes move to the default account; past spends stay in reports but no longer come off any balance
+        [...state.bills, ...(state.extraIncomes || [])].forEach(x => { if (x.account === id) delete x.account; });
+        [...state.spends, ...(state.paidLog || [])].forEach(x => { if (x.account === id) { delete x.account; x.fromDeleted = true; } });
+        if (state.settings.payAccount === id) delete state.settings.payAccount;
+        commit('Account deleted'); }, true); break; }
+    case 'hq': modal(`<h2>What is this?</h2><p class="muted" style="line-height:1.7">${esc(HELP[ds.k] || '')}</p><div class="row" style="justify-content:space-between;margin-top:14px"><button class="how" data-act="helpToggle">Turn help tips off</button><button class="btn" data-act="close">Got it</button></div>`); break;
+    case 'helpToggle': state.settings.help = state.settings.help === false; closeModal(); save(); render(); toast(state.settings.help === false ? 'Help tips hidden. Turn them back on from Today.' : 'Help tips are on: tap any ? to learn what it does'); break;
+    case 'qaPlus': { const q = $('#qa'), m = q.value.match(/^\s*([\d.]+)(.*)$/), cur = m ? +m[1] : 0, rest = m ? m[2] : (q.value ? ' ' + q.value.trim() : ''); q.value = `${Math.round((cur + +ds.v) * 100) / 100}${rest}`; q.focus(); break; }
+    case 'focusQa': $('#qa')?.focus(); $('#qa')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); break;
+    case 'newIncome': modal(incomeForm()); break;
+    case 'editIncome': modal(incomeForm((state.extraIncomes || []).find(x => x.id === id))); break;
+    case 'saveIncome': {
+      if (!need([['#iName', filled], ['#iAmt', positive]], 'Give the income a name and an amount')) return;
+      const data = { name: $('#iName').value.trim(), amount: num($('#iAmt').value), freq: $('#iFreq').value, anchor: $('#iAnchor').value, day1: num($('#iD1').value) || 1, day2: num($('#iD2').value) || 15, split: num($('#iSplit').value), early: $('#iEarly').checked, account: $('#iAcct')?.value || undefined };
+      state.extraIncomes ||= [];
+      if (id) Object.assign(state.extraIncomes.find(x => x.id === id), data); else state.extraIncomes.push({ id: uid(), ...data });
+      closeModal(); commit('Income saved'); break; }
+    case 'delIncome': state.extraIncomes ||= []; removeItem('extraIncomes', id, 'Income'); break;
+    case 'payDebt': modal(paymentForm(find('debts'))); break;
+    case 'savePayment': {
+      if (!need([['#pA', positive]], 'Type how much you paid')) return;
+      const x = find('debts'), amt = num($('#pA').value);
+      x.start ||= +x.balance; (x.payments ||= []).push({ date: $('#pD').value || iso(d0()), amount: amt });
+      x.balance = Math.max(0, Math.round((+x.balance - amt) * 100) / 100);
+      closeModal(); commit(x.balance <= 0 ? `🎉 ${x.name} is paid off!` : `${money(amt)} paid · ${money(x.balance)} left`); break; }
+    case 'calDay': calSel = calSel === ds.d ? null : ds.d; render(); if (calSel) setTimeout(() => document.querySelector('main > .card:last-child')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50); break;
+    case 'calPrev': calOffset--; calSel = null; render(); break;
+    case 'calNext': calOffset++; calSel = null; render(); break;
+    case 'calToday': calOffset = 0; calSel = iso(d0()); render(); break;
+    case 'preset': { if (demoBlocked()) { demoWall(); return; } const p = presets()[+ds.v]; state.spends.push({ id: uid(), ts: Date.now(), date: iso(d0()), amount: p.amount, cat: p.cat in state.budgets ? p.cat : 'Other', note: p.label }); commit(`Logged  · `); break; }
+    case 'savePresets': { const rows = [...document.querySelectorAll('[data-pr]')].map(r => ({ label: r.querySelector('.prL').value.trim(), amount: num(r.querySelector('.prA').value), cat: r.querySelector('.prC').value })).filter(p => p.label && p.amount > 0); state.presets = rows; commit('Quick buttons saved'); break; }
+    case 'newChal': modal(chalForm()); showChalFields(); break;
+    case 'saveChal': {
+      const type = $('#cType').value;
+      if (type === 'custom' && !need([['#cT', positive], ['#cN', positive]], 'Give a target and how many boxes')) return;
+      (state.challenges ||= []).push({ id: uid(), type, name: $('#cName').value.trim() || CHAL_TYPES[type].name, start: $('#cStart').value || iso(d0()), n: type === 'week52' ? 52 : Math.min(365, Math.max(5, num($('#cN').value) || 100)), target: num($('#cT')?.value), goal: $('#cGoal')?.value || '', done: [] });
+      closeModal(); commit('Challenge started. Tap a box each time you save.'); break; }
+    case 'chalBox': {
+      const c = (state.challenges || []).find(x => x.id === id), k = +ds.v, amt = boxAmount(c, k), g = c.goal && state.goals.find(x => x.id === c.goal);
+      c.done ||= [];
+      if (c.done.includes(k)) { c.done = c.done.filter(x => x !== k); if (g) g.saved = Math.max(0, g.saved - amt); save(); render(); toast(`Box ${k} emptied`); }
+      else { c.done.push(k); if (g) g.saved += amt; save(); render(); const st = chalStats(c); toast(st.pct >= 1 ? '🎉 Challenge complete!' : `+${money(amt)} saved · ${money(st.saved, 0)} so far`); }
+      break; }
+    case 'delChal': askConfirm('Remove this challenge?', 'Boxes you filled stay in any linked goal. This only removes the challenge.', 'Remove', () => removeItem('challenges', id, 'Challenge'), true); break;
+    case 'addIncome': {
+      if (!need([['#iiAmt', positive]], 'Type how much came in')) return;
+      (state.moneyIn ||= []).push({ id: uid(), ts: Date.now(), date: $('#iiDate').value || iso(d0()), amount: num($('#iiAmt').value), source: $('#iiSrc').value.trim(), account: $('#iiAcct')?.value || undefined, tax: $('#iiTax').checked });
+      const r = taxRate(), a = num($('#iiAmt').value); commit(r && $('#iiTax').checked ? `Logged ${money(a)} · ${money(a * r / 100)} kept aside for tax` : `Logged ${money(a)}`); break; }
+    case 'delIncomeLog': removeItem('moneyIn', id, 'Income'); break;
+    case 'newEnv': modal(envForm()); break;
+    case 'editEnv': modal(envForm(ds.c)); break;
+    case 'saveEnv': {
+      if (!need([['#eName', filled], ['#eCap', v => String(v).trim() !== '']], 'Give the envelope a name and a monthly cap')) return;
+      const nm = $('#eName').value.trim(), cap = num($('#eCap').value), old = ds.c;
+      if (old && old !== nm) { delete state.budgets[old]; state.spends.forEach(x => { if (x.cat === old) x.cat = nm; }); }
+      state.budgets[nm] = cap; closeModal(); commit('Envelope saved'); break; }
+    case 'range': rangeMonths = +ds.v; render(); break;
+    case 'wrapShow': modal(wrappedHtml(new Date(d0().getFullYear(), d0().getMonth() + monthOffset, 1))); break;
+    case 'wrapLast': modal(wrappedHtml(new Date(d0().getFullYear(), d0().getMonth() - 1, 1))); break;
+    case 'wrapDone': state.wrappedSeen = monthKey(new Date(d0().getFullYear(), d0().getMonth() - 1, 1)); closeModal(); save(); render(); break;
+    case 'print': window.print(); break;
+    case 'csvRange': {
+      const base = new Date(d0().getFullYear(), d0().getMonth() + monthOffset, 1), keys = [...Array(rangeMonths)].map((_, i) => monthKey(new Date(base.getFullYear(), base.getMonth() - i, 1)));
+      const rows = state.spends.filter(x => keys.some(k => x.date.startsWith(k))).sort((a, b) => a.date.localeCompare(b.date));
+      download(`${slug()}-${keys[keys.length - 1]}-to-${keys[0]}.csv`, 'date,amount,category,note\n' + rows.map(x => [x.date, x.amount, x.cat, `"${(x.note || '').replace(/"/g, '""')}"`].join(',')).join('\n'), 'text/csv'); toast(`Exported ${rows.length} spends`); break; }
+    case 'calAddSpend': view = 'spend'; render(); setTimeout(() => { $('#sDate').value = ds.d; $('#sAmt').focus(); }, 30); break;
+    case 'more': modal(`<h2>More</h2><div class="list">${shownMore().map(([k, t]) => `<button class="nav" data-go="${k}" style="font-size:16px">${I[k]}<span>${t}</span></button>`).join('')}</div>`); break;
+    case 'close': closeModal(); break;
+  }
+}
+document.addEventListener('click', e => {
+  const go = e.target.closest('[data-go]'); if (go) { view = go.dataset.go; document.body.classList.remove('focus'); render(); window.scrollTo(0, 0); return; }
+  const a = e.target.closest('[data-act]'); if (a) { e.preventDefault(); act(a.dataset.act, a); return; }
+  if (e.target.id === 'modal' && !$('#modal').dataset.wizard) closeModal();
+});
+document.addEventListener('change', e => { if (e.target.id === 'bFreq') showFields(); if (e.target.id === 'iFreq') showIncomeFields(); if (e.target.id === 'cType') showChalFields(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').dataset.wizard) closeModal(); if (e.key === 'Enter' && $('#modal').classList.contains('on') && e.target.tagName === 'INPUT') { const b = $('#modalCard .btn:not(.ghost):not(.danger)'); if (b && !e.target.classList.contains('wb')) { e.preventDefault(); b.click(); } } });
+render();
+if (location.hash.startsWith('#setup')) wizard(0); else welcomeBack(location.hash.startsWith('#welcome'));
+</script>
+</body>
+</html>
