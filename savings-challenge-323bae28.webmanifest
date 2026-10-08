@@ -1,0 +1,23 @@
+{
+  "name": "Savings Challenge",
+  "short_name": "Savings Challenge",
+  "start_url": "./savings-challenge-323bae28.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1020",
+  "theme_color": "#0f1020",
+  "icons": [
+    {
+      "src": "savings-challenge-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "savings-challenge-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

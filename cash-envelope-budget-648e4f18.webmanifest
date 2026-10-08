@@ -1,0 +1,23 @@
+{
+  "name": "Cash Envelope Budget",
+  "short_name": "Cash Envelope Budget",
+  "start_url": "./cash-envelope-budget-648e4f18.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f1020",
+  "theme_color": "#0f1020",
+  "icons": [
+    {
+      "src": "cash-envelope-budget-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "cash-envelope-budget-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
